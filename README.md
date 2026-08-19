@@ -39,7 +39,6 @@ _Workflow and reproducibility_
 
 * Understand the basics of version control with Git and GitHub.
 * Write fully reproducible code.
-* Understand the value of open science.
 
 ###### B) Critically interpret data
 
@@ -66,15 +65,14 @@ _Workflow and reproducibility_
 _Week 1: Getting started with R/R Studio_
 
 * General course description (objectives, structure, evaluation)
-* Presentation of R/RStudio, Quarto, Github, and open science practices
+* Presentation of R/RStudio and Quarto
 * Intro to basic workflow, data analysis and presentation of the report template
-* How to write a good research question? How to communicate effectively?
 * Exercises (Titanic dataset)
+* How to write a good research question?
 * Mandatory: Read Chapter 1 of From Questions to Knowledge: <https://bookdown.org/danielnettle2/data_analysis/building-blocks.html> Having installed the latest R and R Studio versions on computer: <https://cran.r-project.org/> and <https://posit.co/downloads/>
 
 _Week 2: Variable types, descriptive statistics and data visualization_
 
-* What is a good data visualization?
 * Class exercices
 * Mandatory readings: Chapters 2.1-2.6 of Modern Statistics with R: <https://modernstatisticswithr.com/> + create Github account
 * Optional readings: Chapters 2.7-2.8 of Modern Statistics with R: <https://modernstatisticswithr.com/>
@@ -90,13 +88,17 @@ _Week 4: Description, Inference, Causality_
 * Lecture on hypothesis testing
 * Mandatory videos: https://www.youtube.com/watch?v=0oc49DyA3hU and https://www.youtube.com/watch?v=vemZtEM63GY
 
-**28/09, 9AM: SUBMIT RESEARCH REPORT 1**
+_Week 5: How to communicate effectively?_
+* How to write effectively? Class exercises
+* How to visualize effectively? Class exercises
 
-_Week 5: Oral presentations: research report 1 in one graph_
+**05/10, 9AM: SUBMIT RESEARCH REPORT 1**
 
-Each student briefly presents their RR1 results with one graph. 
+_Week 6: Oral presentations: research report 1 in one graph_
 
-_Week 6: Introduction to the General Linear Model_
+Each student briefly presents their RR1 results with one graph. No reading notes. 
+
+_Week 7: Introduction to the General Linear Model_
 
 * Class exercises on the General Linear Model
 * Mandatory readings:
@@ -107,7 +109,7 @@ _Week 6: Introduction to the General Linear Model_
     * Read Sections 3 to 4.2 (included) of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/ (section 4.3 is optional)
     * HW: Students must identify the dataset they want to use in RR2.
 
-_Week 7: Generalized linear models_
+_Week 8: Generalized linear models_
 
 * Class exercises on the generalized linear model
 * Mandatory readings:
@@ -117,21 +119,22 @@ _Week 7: Generalized linear models_
     * Read Sections 6 and 7 of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/
 
 
-_**Week 8: MIDTERM EXAM**_
+_**Week 9: MIDTERM EXAM**_
 
-2 hours. The midterm exam will be a pen-and-paper exercise and consist in two main types of exercises. One section will test your ability to comment on and interpret a data analysis project from A to Z. You will be asked a series of questions designed to test your programming abilities, statistical reasoning, and your “general intelligence” regarding data analysis (e.g., how to make data analysis decisions and interpret results). A second type of exercises will test more specific knowledge, by exposing you to specific cases. You will be presented with specific situations, data analysis decisions, or chunks of code, and you will be asked to answer questions about them.
+2 hours. The midterm exam will be a pen-and-paper exercise and consist in two main types of exercises. One section will test your ability to comment on and interpret a data analysis project from A to Z. You will be asked a series of questions designed to test your programming abilities, statistical reasoning, and your general skills regarding data analysis (e.g., how to make data analysis decisions and interpret results). A second type of exercises will test more specific knowledge, by exposing you to specific cases. You will be presented with specific situations, data analysis decisions, or chunks of code, and you will be asked to answer questions about them.
 
 ##### PART 2: Audit data (detecting common data analysis traps)
 
-_Week 9: Oral presentations: auditing your RR2 datasets_
+_Week 10: Common data analysis traps_
+
+* Lecture on missing values, outliers, and sensitivity checks
+* Class exercises
+
+_Week 11: Oral presentations: auditing your RR2 datasets_
 
 Students audit their RR2 dataset, identify the potential issues and difficulties that they encounter, and briefly present them to other students.
 
-_Week 10: Audit exercise 1 (selection bias)_
-
-_Week 11: Audit exercise 2 (data viz critique)_
-
-_Week 12: Audit exercise 3 (measurement issues; publication bias)_
+_Week 12: Audit exercise 1 (selection bias; correlation and causality)_
 
 **30/11, 9AM: SUBMIT RESEARCH REPORT 2**
 
@@ -141,18 +144,15 @@ Students present the main findings of RR2 in front of a jury.
 
 ### Grading
 
-* RR1: 10%
+* Midterm: 30%
 
-* Midterm: 20%
+* Final exam: 40%
 
-* RR2: 20%
+* Continuous Assessment: 20%
+    * Research Report 1: 10%
+    * Research Report 2: 10%
 
-* Final exam: 30%
-
-* Class exercises (audit exercises + others): 10%
-
-* Peer feedback + participation: 10%
-
+* Participation, Contribution & Engagement: 10% 
 
 ### Main references
 
