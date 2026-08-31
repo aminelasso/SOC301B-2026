@@ -1,0 +1,280 @@
+---
+title: "Are happy songs more popular? A case study with Spotify data"
+format: html
+editor: visual
+author: Amine Sijilmassi
+date: Winter 2026
+---
+
+### Introduction
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,        # Don't show R code
+  results = "hide",    # Don't show output by default
+  message = FALSE,     # Hide messages (e.g., from library calls)
+  warning = FALSE      # Hide warnings
+)
+```
+
+```{r}
+rm(list=ls())
+# Load
+library(tidyverse)
+library(patchwork)  # This library combines plots easily
+dataset = read_csv("spotify_songs.csv")
+```
+
+Why do people love music? A major debate in the social sciences is whether the human taste for music results from universal biological and cognitive features of our species or contextual influences. On the one hand, universal cognitive drivers like a need for arousal push us toward certain rhythms and beats. On the other hand, genres act as specific systems of codes and norms shaped by history and community. We test this tension using Spotify track data.
+
+**Research question (conceptual):** Are mainstream listening habits driven by universal psychological needs, or by subcultural context?
+
+**Research question (operationalization):** Do core audio features like energy and danceability universally predict track popularity across all songs, or do the rules change completely depending on the playlist genre?
+
+**H1 (I defend the universal view):** Universal audio features—specifically high energy and danceability—will be the strongest positive predictors of track popularity globally, showing that human music choice is driven by universal needs for physical activation rather than genre rules.
+
+**Expected public for this sheet of paper:**
+
+- **A&R and Music Executives:** People working in the music industry who need to know if a hit song requires a universal formula or a niche-specific strategy.
+
+- **Music Streaming Data Scientists:** Analysts at platforms like Spotify or Apple Music building recommendation engines based on audio features versus user tags.
+
+- **Cultural Sociologists:** Researchers studying whether global streaming platforms are creating a single universal musical monoculture or preserving distinct subcultural tribes.
+
+**Research question**: are happy songs more popular than sad songs?
+
+H1: Higher valence is associated with greater track popularity
+
+### Descriptive statistics (1): Description of the main variables of interest
+
+```{r}
+
+#Create a plot
+p1 = ggplot(dataset, aes(x = as.numeric(track_popularity))) +
+  geom_histogram(binwidth = 1, 
+                 fill = "darkgreen",           # Spotify green
+                 color = "black",          # Dark border
+                 alpha = 0.85) + #transparency
+  scale_x_continuous(breaks = seq(0, 100, by = 10),      # Labels every 10
+                     minor_breaks = seq(0, 100, by = 1), # Gridlines every 1
+                     limits = c(0, 100)) +
+  scale_y_continuous(breaks = seq(0, 1000, by = 100),
+                     limits = c(0, 1000)) +
+  labs(title = "Distribution of Track Popularity",
+       x = "Popularity Score",
+       y = "Number of Tracks") +
+  theme_minimal() 
+```
+
+```{r}
+#Create a plot
+p2 = ggplot(dataset, aes(x = as.numeric(valence))) +
+  geom_histogram(binwidth = 0.01,          # Small bins for continuous data
+                 fill = "darkgreen",       
+                 color = "black",          
+                 alpha = 0.85) +
+  scale_x_continuous(breaks = seq(0, 1, by = 0.1),      # Labels every 0.1
+                     minor_breaks = seq(0, 1, by = 0.05), # Gridlines every 0.05
+                     limits = c(0, 200)) +
+  scale_y_continuous(breaks = seq(0, 1000, by = 100),
+                     limits = c(0, 1000)) +
+  labs(title = "Distribution of Valence",
+       x = "Valence (0 = Sad, 1 = Happy)",
+       y = "Number of Tracks",
+       caption = "Data source: Spotify API") +
+  theme_minimal()
+```
+
+```{r}
+p_combined = (p1 | p2)
+```
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
+p_combined
+```
+
+Note however that valence is not equally distributed across genres. As one could expect, some genres (e.g. latin) are significantly more positive than others.
+
+```{r}
+p3 = dataset %>%
+  group_by(playlist_genre) %>%
+  summarise(mean_valence = mean(valence)) %>%
+  ggplot(aes(x = reorder(playlist_genre, mean_valence), 
+             y = mean_valence,
+             fill = playlist_genre)) +  # Fill by genre, not mean_valence
+  geom_col(color = "black", alpha = 0.85) +
+  scale_y_continuous(breaks = seq(0, 0.7, by = 0.1),
+                     limits = c(0, 0.7)) +
+  labs(title = "Average Valence by Genre",
+       subtitle = "Latin music has the highest positivity",
+       x = "Genre",
+       y = "Mean Valence",
+       caption = "Data source: Spotify API") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
+p3
+```
+
+### Descriptive statistics (2): Is valence related to popularity?
+
+Data visualization reveals a slight positive correlation between valence and popularity.
+
+```{r}
+p4 = ggplot(dataset, aes(x = valence, y = track_popularity)) +
+  geom_point(alpha = 0.3,           # Transparency to see overlapping points
+             color = "#1DB954",      # Spotify green
+             size = 1.5) +
+  geom_smooth(method = "lm", 
+              color = "#191414",     # Dark line
+              fill = "#535353",      # Gray confidence interval
+              alpha = 0.2,
+              linewidth = 1.2) +
+  scale_x_continuous(breaks = seq(0, 1, by = 0.1),
+                     limits = c(0, 1)) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10),
+                     limits = c(0, 100)) +
+  labs(title = "Relationship Between Valence and Track Popularity",
+       subtitle = "Higher valence shows weak positive correlation with popularity",
+       x = "Valence (0 = Sad, 1 = Happy)",
+       y = "Track Popularity") +
+  theme_minimal()
+```
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
+p4
+```
+
+However, this relationship likely varies by genre. Different genres serve different emotional functions and attract distinct listener communities, so the valence-popularity relationship could look quite different across musical styles. Before examining genre-specific patterns, we should first verify that our dataset has adequate representation across genres. Table 1 confirms that sample sizes are reasonably balanced, with each genre containing between 4,800 and 6,000 tracks.
+
+```{r}
+#| results: "asis"
+# Simple version
+dataset %>%
+  count(playlist_genre, name = "#Tracks") %>%
+  arrange(desc(`#Tracks`)) %>%
+  mutate(
+    Percentage = paste0(round(`#Tracks` / sum(`#Tracks`) * 100, 1), "%")
+  ) %>%
+  rename(Genre = playlist_genre) %>%
+  knitr::kable(align = c('l', 'r', 'r'))
+```
+
+As expected, the relationship between track valence and popularity varies by genre. In particular, the relationship is especially pronounced for edm tracks. By contrast, the relationship goes in the opposite direction for R&B tracks, with sad R&B songs more popular than happier ones. This makes intuitive sense: edm songs are usually played in a social, festive setting whereas the R&B genre generally revolved around intimate emotions.
+
+```{r}
+p5 = ggplot(dataset, aes(x = valence, y = track_popularity, color = playlist_genre)) +
+  geom_point(alpha = 0.01, size = 1) +
+  geom_smooth(method = "lm", 
+              se = FALSE,
+              linewidth = 1.2,
+              alpha = 0.5) +
+  scale_x_continuous(breaks = seq(0, 1, by = 0.2),
+                     limits = c(0, 1)) +
+  scale_y_continuous(breaks = seq(0, 100, by = 20),
+                     limits = c(0, 100)) +
+  scale_color_brewer(palette = "Set2", name = "Genre") +
+  labs(title = "Valence vs Track Popularity by Genre",
+       subtitle = "Relationship between musical positivity and popularity across different genres",
+       x = "Valence (Musical Positivity)",
+       y = "Track Popularity",
+       caption = "Data source: Spotify API | Lines show linear trend with 95% CI") +
+  theme_minimal()
+```
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
+p5
+```
+
+Let us now look closer at the distribution of edm and R&B songs, to check whether these results are not driven by peculiar patterns for these variables. The figures below show that both variables follow a reasonably balanced normal distribution.
+
+```{r}
+p6 = dataset %>%
+  filter(playlist_genre %in% c("edm", "r&b")) %>%
+  ggplot(aes(x = valence, fill = playlist_genre)) +
+  geom_histogram(bins = 30, 
+                 color = "black", 
+                 alpha = 0.85,
+                 show.legend = FALSE) +
+  scale_x_continuous(breaks = seq(0, 1, by = 0.2),
+                     limits = c(0, 1)) +
+  scale_fill_manual(values = c("edm" = "lightyellow", "r&b" = "lightblue")) +
+  facet_wrap(~playlist_genre, ncol = 1) +
+  labs(title = "Distribution of Valence: EDM vs R&B",
+       subtitle = "Separate views for each genre",
+       x = "Valence (Musical Positivity)",
+       y = "Number of Tracks",
+       caption = "Data source: Spotify API") +
+  theme_minimal()
+```
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
+p6
+```
+
+### Statistical inference
+
+```{r}
+#Correlations
+
+# Overall correlation test
+cat("=== OVERALL ===\n")
+cor.test(dataset$track_popularity, dataset$valence)
+
+# EDM correlation test
+cat("\n=== EDM ===\n")
+edm_data <- dataset %>% filter(playlist_genre == "edm")
+cor.test(edm_data$track_popularity, edm_data$valence)
+
+# R&B correlation test
+cat("\n=== R&B ===\n")
+rnb_data <- dataset %>% filter(playlist_genre == "r&b")
+cor.test(rnb_data$track_popularity, rnb_data$valence)
+```
+
+We examined the relationship between track popularity and valence (musical positivity) across the entire dataset and specifically within EDM and R&B genres. Overall, there was a weak positive correlation between valence and track popularity (*r* = `r round(cor.test(dataset$track_popularity, dataset$valence)$estimate, 3)`, *p* \< .001). However, this relationship varied substantially by genre.For EDM tracks, we found a weak positive correlation (*r* = `r round(cor.test(edm_data$track_popularity, edm_data$valence)$estimate, 3)`, *p* \< .001), suggesting that more positive-sounding EDM songs tend to be slightly more popular.In contrast, R&B showed a weak negative correlation (*r* = `r round(cor.test(rnb_data$track_popularity, rnb_data$valence)$estimate, 3)`, *p* \< .001), indicating that less positive-sounding R&B tracks are associated with greater popularity.These findings suggest that the relationship between musical positivity and popularity is genre-dependent, with opposite patterns emerging in EDM versus R&B music.
+
+### Robustness check: do the results replicate if we control for danceability?
+
+```{r}
+p7 = dataset %>%
+  mutate(mood = if_else(valence >= 0.5, "Happy", "Sad")) %>%
+  ggplot(aes(x = danceability, fill = mood)) +
+  geom_histogram(bins = 40, color = "black", show.legend = FALSE) +
+  scale_fill_manual(values = c("Happy" = "lightyellow", "Sad" = "steelblue")) +
+  facet_wrap(~mood, ncol = 1) +
+  labs(title = "Distribution of Danceability by Track Valence",
+       subtitle = "Split at valence = 0.5",
+       x = "Danceability",
+       y = "Count") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 11, hjust = 0.5),
+    strip.text = element_text(size = 12, face = "bold")
+  )
+```
+
+It is possible that the relationship between valence and popularity is driven by a confound variable: danceability. Perhaps happier song also tend to be more danceable song, and it is the danceability, and not the happiness, that makes the track popular. Indeed, as the table below shows, happier songs are more danceable than sadder ones.
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
+p7
+```
+
+```{r}
+#Run multilinear regression
+model = lm(data = dataset, track_popularity ~ valence + danceability)
+summary(model)
+```
+
+I run a multiple linear regression with valence as the predictor variable and danceability as an additional control variable. We find that the positive effect of valence on track popularity persists even when accounting for danceability (*β* = `r round(coef(model)["valence"], 2)`, *p* \< .001). Danceability itself shows a stronger positive association with popularity (*β* = `r round(coef(model)["danceability"], 2)`, *p* \< .001), suggesting that tracks with higher danceability tend to be more popular overall. However, the model explains only a small portion of variance in track popularity (*R*² = `r round(summary(model)$r.squared, 3)`), indicating that valence and danceability alone are insufficient to predict what makes a track popular.
+
+### Discussion
+
+This analysis reveals that valence has a small but significant positive effect on track popularity: happier-sounding tracks tend to be slightly more popular. This relationship holds even when controlling for danceability. Importantly, we also find that this relationship is heavily genre-dependent: happier songs are more popular for edm tracks but *less* popular for R&B tracks.
+
+### References

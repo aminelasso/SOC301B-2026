@@ -1,0 +1,261 @@
+---
+title: "The effect of information campaigns on anti-immigration prejudice"
+format: html
+editor: visual
+author: Amine Sijilmassi
+date: Winter 2026
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,        # Don't show R code
+  results = "hide",    # Don't show output by default
+  message = FALSE,     # Hide messages (e.g., from library calls)
+  warning = FALSE      # Hide warnings
+)
+```
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(broom)
+dataset = read_csv("final_data_study2.csv")
+```
+
+### Introduction
+
+Anti-immigration attitudes are pravalent across Western societies and are often strongly associated with misperceptions about immigration.
+
+**Main question**: does exposure to accurate information about immigration reduce misperceptions?
+
+**H1**: *Participants exposed to the accurate information will become less likely to believe that immigrants come for welfare benefits*
+
+**H2**: *Participants exposed to the accurate information will become less likely to believe that (non-French-speaking) immigrants don't learn French*
+
+**H3**: *Participants exposed to the accurate information will become less likely to believe that immigrants don't actively look for jobs*
+
+**H4**: *Participants exposed to the accurate information will become less likely to believe that immigrants do not catch up with the educational level of natives*
+
+### Descriptive statistics
+
+```{r}
+# Load required library
+library(ggplot2)
+library(patchwork)  # This library combines plots easily
+
+# Plot 1: Welfare
+p1 <- ggplot(dataset, aes(x = factor(welfare_before, 
+                                levels = c(0, 1),
+                                labels = c("No", "Yes")))) +
+  geom_bar(aes(y = after_stat(count/sum(count) * 100),
+               fill = factor(welfare_before)),
+               color = "black",
+               width = 0.6) +
+  geom_text(stat = 'count',
+            aes(label = paste0(round(after_stat(count/sum(count) * 100), 1), "%"),
+                y = after_stat(count/sum(count) * 100)),
+            vjust = -0.5,
+            size = 4,
+            fontface = "bold") +
+  labs(title = "Imm. come for welfare",
+       x = "Response",
+       y = "Percentage (%)") +
+  scale_fill_manual(values = c("lightblue", "orange")) +
+  scale_y_continuous(limits = c(0, 100),
+                     breaks = seq(0, 100, 20),
+                     expand = c(0, 0)) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "none")
+
+# Plot 2: Language
+p2 <- ggplot(dataset, aes(x = factor(language_before, 
+                                levels = c(0, 1),
+                                labels = c("No", "Yes")))) +
+  geom_bar(aes(y = after_stat(count/sum(count) * 100),
+               fill = factor(language_before)),
+               color = "black",
+               width = 0.6) +
+  geom_text(stat = 'count',
+            aes(label = paste0(round(after_stat(count/sum(count) * 100), 1), "%"),
+                y = after_stat(count/sum(count) * 100)),
+            vjust = -0.5,
+            size = 4,
+            fontface = "bold") +
+  labs(title = "Imm. don't learn French",
+       x = "Response",
+       y = "Percentage (%)") +
+  scale_fill_manual(values = c("lightblue", "orange")) +
+  scale_y_continuous(limits = c(0, 100),
+                     breaks = seq(0, 100, 20),
+                     expand = c(0, 0)) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "none")
+
+# Plot 3: Unemployed
+p3 <- ggplot(dataset, aes(x = factor(unemployed_before, 
+                                levels = c(0, 1),
+                                labels = c("No", "Yes")))) +
+  geom_bar(aes(y = after_stat(count/sum(count) * 100),
+               fill = factor(unemployed_before)),
+               color = "black",
+               width = 0.6) +
+  geom_text(stat = 'count',
+            aes(label = paste0(round(after_stat(count/sum(count) * 100), 1), "%"),
+                y = after_stat(count/sum(count) * 100)),
+            vjust = -0.5,
+            size = 4,
+            fontface = "bold") +
+  labs(title = "Imm. don't look for jobs",
+       x = "Response",
+       y = "Percentage (%)") +
+  scale_fill_manual(values = c("lightblue", "orange")) +
+  scale_y_continuous(limits = c(0, 100),
+                     breaks = seq(0, 100, 20),
+                     expand = c(0, 0)) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "none")
+
+# Plot 4: Children
+p4 <- ggplot(dataset, aes(x = factor(children_before, 
+                                levels = c(0, 1),
+                                labels = c("Less", "Better or equal")))) +
+  geom_bar(aes(y = after_stat(count/sum(count) * 100),
+               fill = factor(children_before)),
+               color = "black",
+               width = 0.6) +
+  geom_text(stat = 'count',
+            aes(label = paste0(round(after_stat(count/sum(count) * 100), 1), "%"),
+                y = after_stat(count/sum(count) * 100)),
+            vjust = -0.5,
+            size = 4,
+            fontface = "bold") +
+  labs(title = "Children educ. (Imm. vs. natives)",
+       x = "Response",
+       y = "Percentage (%)") +
+  scale_fill_manual(values = c("lightblue", "orange")) +
+  scale_y_continuous(limits = c(0, 100),
+                     breaks = seq(0, 100, 20),
+                     expand = c(0, 0)) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "none")
+
+# Combine all 4 plots into one figure (2x2 grid)
+p_combined = (p1 | p2) / (p3 | p4) +
+  plot_annotation(title = "Misperceptions about immigrants",
+                  theme = theme(plot.title = element_text(size = 16, 
+                                                          face = "bold", 
+                                                          hjust = 0.5)))
+
+```
+
+This report analyzes data from a randomized experiment to test these hypotheses. Participants were randomly assigned to receive either accurate statistics about immigration (treatment group) or no information (control group), and the survey measured their beliefs about four common stereotypes: that immigrants primarily come for welfare benefits, that they don't learn French, that they don't actively look for jobs, and and that their children do not reach catch up with the educational level of natives.
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
+p_combined
+```
+
+*Figure 1:*
+
+Data visualization suggests that the treatment significantly reduced the endorsement of all four misperceptions about immigration (see Figure 2).
+
+```{r}
+#Plot to visualize the evolution across time by condition
+
+summary_data = dataset %>%
+  group_by(treatment) %>%
+  summarise(mean_welfare_before = mean(welfare_before),
+            mean_welfare_after = mean(welfare_after_round1),
+            mean_welfare_after2 = mean(welfare_after_round2, na.rm = TRUE),
+            mean_language_before = mean(language_before),
+            mean_language_after = mean(language_after_round1),
+            mean_language_after2 = mean(language_after_round2, na.rm = TRUE),
+            mean_unemployed_before = mean(unemployed_before),
+            mean_unemployed_after = mean(unemployed_after_round1),
+            mean_unemployed_after2 = mean(unemployed_after_round2, na.rm = TRUE),
+            mean_children_before = mean(children_before),
+            mean_children_after = mean(children_after_round1),
+            mean_children_after2 = mean(children_after_round2, na.rm = TRUE))
+
+# Reshape from wide to long format
+plot_data <- summary_data %>%
+  pivot_longer(cols = -treatment,  # Keep treatment column, pivot everything else
+               names_to = "variable",
+               values_to = "percentage") %>%
+  
+  # Separate the variable column into belief type and time point
+  separate(variable, into = c("mean", "belief", "time"), sep = "_") %>%
+  
+  # Remove the "mean" column (we don't need it)
+  select(-mean) %>%
+  
+  # Clean up the time variable
+  mutate(time = case_when(
+    time == "before" ~ "Before",
+    time == "after" ~ "After",
+    time == "after2" ~ "After Round 2",
+    TRUE ~ time
+  ),
+  # Order time correctly
+  time = factor(time, levels = c("Before", "After", "After Round 2")),
+  
+  # Convert treatment to readable labels
+  group = factor(treatment, levels = c(0, 1), labels = c("Control", "Treatment")),
+  
+  # Convert percentage to actual percentage (multiply by 100)
+  percentage = percentage * 100)
+
+```
+
+```{r}
+p2 = plot_data %>%
+  ggplot(aes(x = time, y = percentage, color = group, group = group)) +
+  
+  geom_line(size = 1.5) +
+  geom_point(size = 4) +
+  
+  labs(x = "Time Point",
+       y = "Percentage Endorsing Belief (%)",
+       color = "Group") +
+  
+  scale_color_manual(values = c("Treatment" = "orange", "Control" = "steelblue")) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 20)) +
+  
+  facet_wrap(~belief, ncol = 2) +
+  
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "top")
+```
+
+```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
+p2
+```
+
+*Figure 2: ???*
+
+### Statistical inference
+
+```{r}
+# Welfare
+welfare_table1 <- table(dataset $ treatment, dataset $ welfare_after_round1)
+welfare_chi1 <- chisq.test(welfare_table1)
+
+# Language
+language_table1 <- table(dataset $ treatment, dataset $ language_after_round1)
+language_chi1 <- chisq.test(language_table1)
+
+# Unemployed
+unemployed_table1 <- table(dataset $ treatment, dataset $ unemployed_after_round1)
+unemployed_chi1 <- chisq.test(unemployed_table1)
+
+# Children
+children_table1 <- table(dataset $ treatment, dataset $ children_after_round1)
+children_chi1 <- chisq.test(children_table1)
+```
+
+We tested whether factual information changed immigration beliefs using chi-squared tests. The treatment significantly reduced negative perceptions: agreement that immigrants come for welfare dropped from `r round(prop.table(welfare_table1, 1)[1,2] * 100, 1)`% in control to `r round(prop.table(welfare_table1, 1)[2,2] * 100, 1)`% in treatment (χ² = `r round(welfare_chi1$statistic, 2)`, p `r ifelse(welfare_chi1$p.value < 0.001, "< 0.001", paste("=", round(welfare_chi1$p.value, 3)))`), while language barrier beliefs decreased from `r round(prop.table(language_table1, 1)[1,2] * 100, 1)`% to `r round(prop.table(language_table1, 1)[2,2] * 100, 1)`% (χ² = `r round(language_chi1$statistic, 2)`, p `r ifelse(language_chi1$p.value < 0.001, "< 0.001", paste("=", round(language_chi1$p.value, 3)))`).However, effects on unemployment beliefs (`r round(prop.table(unemployed_table1, 1)[1,2] * 100, 1)`% vs `r round(prop.table(unemployed_table1, 1)[2,2] * 100, 1)`%, χ² = `r round(unemployed_chi1$statistic, 2)`, p = `r round(unemployed_chi1$p.value, 3)`) and family size perceptions (`r round(prop.table(children_table1, 1)[1,2] * 100, 1)`% vs `r round(prop.table(children_table1, 1)[2,2] * 100, 1)`%, χ² = `r round(children_chi1$statistic, 2)`, p = `r round(children_chi1$p.value, 3)`) were not statistically significant, suggesting the treatment worked selectively on certain immigration stereotypes.
+
+### Summary
+
+Our analysis demonstrates that factual information effectively corrects immigration misperceptions across all four stereotypes tested. The treatment significantly reduced agreement with these common misconceptions, providing evidence that information interventions can counter negative stereotypes about immigrants. These findings suggest that evidence-based communication campaigns could play a valuable role in shaping more accurate public discourse on immigration. Future research should explore whether treatment effects vary by political ideology. For instance, far-right supporters may respond differently to factual corrections than other voters, with important implications for targeting information campaigns.
+
+### References

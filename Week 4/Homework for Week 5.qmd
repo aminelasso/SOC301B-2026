@@ -1,0 +1,98 @@
+---
+title: "Homework for Week 5"
+format: 
+  html:
+    self_contained: true
+    toc: true
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false 
+  error: false
+editor: visual
+---
+
+<<<<<<< HEAD
+## 
+
+test
+=======
+## Context
+
+In 1971, Moore and Krupat were interested in the "social mechanics" of conformity. They wanted to know: Is conformity driven by **who you are** (your personality) or by **who you are talking to** (social status)?
+
+They measured:
+
+-   **Conformity**: The number of times a participant agreed with a partner's incorrect judgment.
+
+-   **F-Score**: A personality scale measuring "Authoritarianism" (higher scores = more rigid/authoritarian).
+
+-   **Partner Status**: An experimental manipulation where the partner was either "High" status (an expert) or "Low" status (a peer).
+
+```{r}
+# These libraries are required for the analysis
+# If you don't have them, run install.packages()
+library(tidyverse)
+library(carData)
+library(performance)
+library(effectsize)
+library(see)
+
+# Load the dataset (just run this code)
+data("Moore")
+data <- Moore
+```
+
+## Part 1: Conformism and authoritarianism
+
+*You begin with a simple hypothesis: People with authoritarian personalities are naturally more likely to conform, regardless of the situation.*
+
+### Question 1
+
+Create a scatterplot showing the relationship between `fscore` (x-axis) and `conformity` (y-axis). Add a linear regression line.
+
+### Question 2
+
+Fit a linear model (m1) where fscore predicts conformity.
+
+### Question 3
+
+Mathematically, the intercept is the predicted value of Y when X=0. Look at your output. Does an fscore of 0 exist in your dataset? If not, does the intercept have a meaningful "real-world" interpretation here?
+
+### Question 4
+
+For every 1-point increase on the F-scale, exactly how many more (or fewer) times is a person expected to conform?
+
+### Question 5
+
+Look at the p-value. How do you interpret this number? Conclude on what you can infer or not from this sample.
+
+## Part 2: Experiment
+
+*Your colleague disagrees with you. They argue that personality is irrelevant; what matters is the social pressure. If your partner is an "Expert" (High Status), you conform. If they are a "Peer" (Low Status), you don't.*
+
+### Question 6
+
+Fit a model (m2) where partner.status predicts conformity.
+
+### Question 7
+
+R uses automatic "Dummy Coding" when dealing with categorical predictors. In your output, which group is being treated as the "Baseline" (the Intercept)? How can you tell?
+
+### Question 8
+
+Based *only* on the "Estimate" column in your summary, what is the exact average conformity score for the low-status group?
+
+### Question 9
+
+A student claims you should have used an *Independent Samples t-test* here instead of a Linear Model. Explain why the p-value of the partner.statuslow coefficient in your lm output is identical to the p-value you would get from a t-test.
+
+### Question 10
+
+Run the code below. What does it do? What do you conclude?
+
+### Question 11
+
+Generate a plot to illustrate the effect of the experiment (including a representation of the linear model). Conclude on the results of this experiment.
+>>>>>>> c6196fab6e0e01bf8f802e3e12d2e9e354068f78

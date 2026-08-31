@@ -1,0 +1,81 @@
+---
+title: "Exercises Week 1"
+format: 
+  html:
+    self_contained: true
+    toc: true
+    embed-resources: true
+editor: visual
+---
+
+*You can find useful tutorials in Section 2 of this handbook: <https://modernstatisticswithr.com/>*
+
+### Question 1:
+
+Install R and RStudio; then run the following code in the console:
+
+```{r}
+print("Hello World")
+```
+
+### Question 2:
+
+Create a normal script document (not Quarto yet). Once again, print the "Hello World" message using the same code as above. NB: make sure that you have set a specific directory for this script.
+
+### Question 3:
+
+Load the tidyverse package using the library() function. If you haven't downloaded it yet, do it using the install.packages() function.
+
+### Question 4:
+
+Download the titanic dataset from Canvas (in "Files" section); and load it on R. How many rows and columns does it have?
+
+### Question 5:
+
+Below is a table describing the variables in the dataset.
+
+|               |                     |                                          |
+|---------------|---------------------|------------------------------------------|
+| Variable      | Description         | Key/Notes                                |
+| **Pclass**    | Passenger Class     | 1 = 1st; 2 = 2nd; 3 = 3rd                |
+| **survival**  | Survival            | 0 = No; 1 = Yes                          |
+| **name**      | Name                | \-                                       |
+| **sex**       | Sex                 | \-                                       |
+| **age**       | Age                 | \-                                       |
+| **sibsp**     | Siblings/Spouses    | Number aboard                            |
+| **parch**     | Parents/Children    | Number aboard                            |
+| **ticket**    | Ticket Number       | \-                                       |
+| **fare**      | Passenger Fare      | British pound                            |
+| **cabin**     | Cabin               | \-                                       |
+| **embarked**  | Port of Embarkation | C=Cherbourg; Q=Queenstown; S=Southampton |
+| **boat**      | Lifeboat            | \-                                       |
+| **body**      | Body ID Number      | \-                                       |
+| **home.dest** | Home/Destination    | \-                                       |
+
+What percentage of people survived?
+
+### Question 6:
+
+How many males and females were there in the Titanic dataset?
+
+### Question 7:
+
+What is the percentage of people in each class (1st, 2nd and 3rd)?
+
+### Question 8:
+
+What percentage of people survived in each class? How can you interpret this result?
+
+### Question 9:
+
+What is the median age of passengers? Create a new variable called 'age_binary', which takes the value "Young" if the person's age is below the median, and the value "Old" if the age is above.
+
+### Question 10:
+
+Create a new variable called age_categories, which categorizes passengers by 10-year age groups (0-9 yo; 10-19 yo; 20-29yo; etc.. until 90-99yo if need be).
+
+### Short report (due for Week 2):
+
+Put forth your own hypothesis: what variables might be associated with surviving the Titanic disaster? In a Quarto document, write a short report, where you present a hypothesis, and compute descriptive statistics that might provide an answer. Present these statistics in the form of a table using the kable() function.
+
+*Bonus:* Illustrate this statistic with a simple visualization.

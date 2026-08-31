@@ -1,0 +1,166 @@
+---
+title: "Exercises Week 3"
+format: 
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false 
+  error: false
+editor: visual
+---
+
+The exercise of today has two main learning objectives. The first is to keep practicing how to transform data and turn it into tidy data. The second is to develop first-hand experience with psychological data, and get a sense of what challenges they typically pose. As a bonus, you will learn to implement GitHub in your programming workflow.
+
+# Context
+
+In 2020, I began my first cognitive science internship, studying how socio‑economic status affects threat sensitivity. My role was to run a behavioral experiment measuring individual threat sensitivity and analyze whether these scores were related to participants’ SES.
+
+After launching the experiment and collecting the data, I quickly realized how messy real‑world data can be—very different from the clean, artificial datasets I had worked with in class. This messiness had two main causes. First, some mistakes and sub‑optimal design choices on my part made the data harder to interpret. Second, there were structural limitations in the data‑collection software (Qualtrics) that shaped the data in ways that favored collection rather than analysis.
+
+I later learned that this is a common issue: data is often structurally messy because of practical constraints during collection. As a result, before running any analyses, I had to first clean and reorganize the data.
+
+# Study
+
+This dataset comes from a behavioral experiment about how people respond to negative feedback (or "punishment"), and whether this response differs depending on their socio‑economic background. Our hypothesis was that because individuals from socio-economic background are exposed to more threats, and stand to lose more from negative shocks, they would adapt their reponse faster to negative feedback.
+
+Participants completed a simple computer task in which they had to make quick decisions. They were shown two lines: a shorter one and a longer one, and they had to tell which one it was (see Figure below). When they made a mistake, they were sometimes "punished" (they lost money from their initial endowment, so they would be paid less at the end of the experiment). Importantly, we introduced an asymmetry in the punishments. One line was punished on average 75% of failures (the "harsh" line) while the other was punished on average 25% of failures (the "lenient" line).
+
+Each task consisted in a series of trials (i.e. everytime the participant answers "short or long"), themselves divided into three blocks. From this task, we measure how accurate participants were, how fast they responded, and how their decision strategy changed depending on which line appeared. A key variable in the dataset is *punishment sensitivity score*, which captures how much a participant changes their behavior between the first and the last block. In other words, it tells us how sensitive someone is to punishment.
+
+Participants also answered questions about their socio‑economic situation. This includes objective information such as income and education, as well as subjective measures describing how people perceive their own social and economic position.
+
+![](images/clipboard-1292491563.png)
+
+### Question 1
+
+Load the negativity_bias csv file. Look closely at the data. You should observe that two rows are out of place, and potentially useless. Identify these two rows, and remove them.
+
+### Question 2
+
+Look at the variable names. You'll find that most of them have an "intuitive" name that matches what is measured. But this is because I took the time to give a proper name to all variables. When initially downloaded, Qualtrics gave me the variable names in default figures. To illustrate, I left three variables as they initially were: see the three variables that start with Q570. They represent three variables measuring people's perceived material security (Q570_1: I have enough money to buy the things I want; Q570_2: I have enough money to pay the bills; Q570_3: I think I will have to worry about money in the future).
+
+*Give each variable a more natural name and give the mean value of each.*
+
+### Question 3
+
+Look at the subjective_wealth variable. This variable corresponds to a question asking the participant to imagine his country's wealth distribution as a ladder, and say whether he feels more at the top (10) or at the bottom (1).
+
+*Calculate the mean of this variable. Is it plausible?*
+
+### Question 4
+
+Look closely at the variable. You can use the unique() function to look at all of the values that the variable takes in your dataset. *What seems to be happening? Propose a solution to the problem.*
+
+### Question 5
+
+Ideally, we'd like to only keep participants who completed the study. Qualtrics gives a measure of participant progress, in %, under the 'Progress' variable. Remove participants who didn't complete the study. How many people are left?
+
+### Question 6
+
+We also have data on study duration (in seconds), under the 'duration_sec' variable. Remove participants whose duration is 3 standard deviations above or below the mean duration of the study (it's a common procedure to remove extreme cases in the data). How many people are left?
+
+### Question 7
+
+Look closely at the 'results' section. What makes this variable weird? (you don't have to understand it right now, just answer what 'feels' weird with this variable).
+
+### Question 8
+
+As you can see, the 'results' columns consists in sequences of numbers (e.g.: 1.1,0,1,1,0,0,1,1352) separated by a semicolon (;). You don't need to understand what each number represents right now; just remember that each sequence corresponds to a *trial*, and that each number in each sequence represents crucial data about that trial.
+
+*Use separate_rows()* to give each trial its own row.
+
+**Do this by creating a new dataframe object called data_long (but keep the current dataframe, you'll need it later).**
+
+How many rows did your dataframe have, and how many rows does it have now?
+
+*(NB: typically, a smart way of using AI here would be to ask for a tutorial explaining how this function works or operates, and then you try to apply it in this case)*
+
+### Question 9
+
+Each row in the results column currently looks like this: 1.1,0,1,1,0,0,1,1352. In the respective order, this sequence captures crucial information about each trial: Condition (1.1 or 1.2 or 2.1 or 2.2), Block (0 or 1 or 2 or 3), the n° of the trial, whether the image was long (1) or short (0), whether the participant said it was long (1) or short (0), whether the participant was correct (1) or not (0), whether the punishment was displayed (1) or not (0), and response time in milliseconds.
+
+*Use the separate() function to split the results column into these 8 distinct variables.* In the respective order, the variables should be named: "condition", "block", "nTrial", "is_long", "responded_long", "is_correct", "punishment", "rt".
+
+Try to describe what happened to your data. Is the resulting dataframe tidy? Explain.
+
+### Question 10
+
+Depending on the condition, whether the short or the long line was the most punished one varied. To simplify, let's categorize for each trial whether it was the 'Harsh' (i.e. most punished) line or the 'Lenient' (i.e. least punished) that was presented to the participant. To achieve this, run this code:
+
+```{r}
+#| eval: false
+data_long <- data_long %>% #use whatever name *you* gave the dataset
+  mutate(Stim_Type = case_when(
+    (condition == 1.1 | condition == 2.1) & is_long == 1 ~ "Harsh",
+    (condition == 1.1 | condition == 2.1) & is_long == 0 ~ "Lenient",
+    (condition == 1.2 | condition == 2.2) & is_long == 1 ~ "Lenient",
+    (condition == 1.2 | condition == 2.2) & is_long == 0 ~ "Harsh"
+  ))
+```
+
+You now have a new Stim_Type variable, which tells you what kind of line appeared in each trial.
+
+Verify that, indeed, when the participant was wrong, they were more likely to be punished when confronted to a "Harsh" than a "Lenient" line, and that the probabilities match with what is expected (around 75% vs. 25% chance of punishment). Whenever you run a study that involves randomization, it's always a good idea to check whether this randomization was successful.
+
+### Question 11
+
+The *accuracy* of a participant is its rate of correct responses. Was accuracy the same for Harsh and Lenient lines? Did this evolve across blocks?
+
+### Question 12
+
+The point of the study was to measure "bias" (i.e. how much participant reponses change when they see the Harsh or Lenient line), and how this bias evolves over time. The standard formula to calculate bias is:
+
+```         
+Bias of an individual = 0.5 * log((Accuracy for Harsh * (1 - Accuracy for Lenient)) / ((1 - Accuracy for Harsh) * Accuracy for Lenient))
+```
+
+Intuitively, you can see that the more accuracy for Harsh lines is superior to the accuracy for Lenient lines, the higher the bias (i.e. individuals only respond Harsh when they're ultra sure, probably to avoid punishment, whereas individuals are more relaxed when responding the Lenient line).
+
+To calculate it, we'll create **a new dataframe object called summary_data**. First write this code to determine how accurate *each person* was for each type of line (Harsh vs. Lenient) in each block:
+
+```{r}
+#| eval: false
+summary_data <- data_long %>% 
+  group_by(ResponseId, block, Stim_Type) %>%
+  summarize(accuracy = mean(is_correct, na.rm = TRUE)) %>%
+    filter(is.na(block) == FALSE) #At this point, your data has multiple missing values that are not very important for this exercice. The filter() step here removes the missing values
+```
+
+Right now, your Harsh scores and Lenient scores are in different rows. *To compare them easily, use pivot_wider() on the summary_table dataframe so that 'Harsh' and 'Lenient' become their own columns.*
+
+Describe what happened to your data.
+
+### Question 13
+
+Once you have your summary_data dataframe in the right format, create a 'bias' variable representing participants' bias as per the formula presented earlier.
+
+NB: You may see `Inf` values in your results. This happens when accuracy is exactly 1. This is a common occurrence in this type of behavioral tasks. To fix this, before creating the bias variable you must write a code that transforms the accuracy columns: whenever a value is equal to **1**, change it to **0.99**; and whenever a value is equal to **0**, change it to **0.01**.
+
+### Question 14
+
+Now that you have a bias value for every block, we would like to calculate a *punishment_sensitivity* variable for each participant, representing the bias at block 3 *divided by* the block at block 1.
+
+But you'll notice a problem: the bias for Block 1 and the bias for Block 3 are in different rows. To perform mathematical operations between different blocks (like dividing one by the other), it is much easier if those values are side-by-side in the same row.
+
+*Use the pivot_wider()* function to reshape the dataframe, such that each block's bias gets its own column. Before running pivot_wider(), I recommend that you make sure that you select() only the relevant columns: ResponseId, block, and bias.
+
+Once your dataset is in the right format, create a variable that captures the punishment sensitivity score for each participant. NB: When calculating this score, you will notice some Inf (infinite) or NaN (Not a Number) results again. This occurs because some participants have a bias of exactly 0 in Block 1, and R cannot divide by zero. To resolve this, you must apply a small correction: transform any Block 1 bias value that equals 0 into 0.01 before you perform the division.
+
+*What is the mean punishment sensitivity score?*
+
+### Question 15
+
+You now have the punishment sensitivity score for every participant. It's now time to test whether this variable is correlated to the participants' subjective wealth. But in your current summary_data dataframe, you don't have this latter variable.
+
+So you need to **merge** this dataset to your original dataset (the one as we left it in Question 8, where you have all info about participants).
+
+First, using the original dataset, create a smaller dataframe called small_data that contains only the two columns we need (remember, you can use select() for that): RespondentId and subjective_wealth. This way, we don't carry around unnecessary columns.
+
+*Then use the left_join() function to merge the two datasets to produce a new dataframe (call it final_data) that has both the punishment sensitivity score and subjective wealth of all participants. Explain what this function does.*
+
+### Question 16
+
+Is there a correlation between a participant's punishment sensivity score and their subjective wealth? (you can use the cor.test function to run a correlation). Conclude.

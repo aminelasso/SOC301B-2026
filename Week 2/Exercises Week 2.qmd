@@ -1,0 +1,104 @@
+---
+title: "Exercises Week 2"
+format: 
+  html:
+    self_contained: true
+    toc: true
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false 
+  error: false
+editor: visual
+---
+
+*You can find useful tutorials in Section 2 of this handbook: <https://modernstatisticswithr.com/>*
+
+## Context
+
+The United States experiences far more mass shooting events than many other developed country in the world. While policymakers, politicians, the media, activists, and the general public recognize the widespread prevalence of these tragic events, policies intended to stop these events should be grounded in evidence and empirical data.
+
+In July 2012, in the aftermath of a mass shooting in a movie theater in Aurora, Colorado, [Mother Jones](https://www.motherjones.com/politics/2012/07/mass-shootings-map/) published a report on mass shootings in the United States since 1982. Importantly, they provided the underlying data set as [an open-source database](https://www.motherjones.com/politics/2012/12/mass-shootings-mother-jones-full-data/) for anyone interested in studying and understanding this criminal behavior.
+
+## Dataset
+
+Load this dataset using the read.csv() function.
+
+```{r}
+library(tidyverse)
+library(knitr)
+data = read.csv("shootings.csv")
+```
+
+## Exercises
+
+*Note: the assignment must be returned in the perfect format:*
+
+1.  Code must appear, but not warning messages and console outputs
+2.  Code must be well-commented and clearly written (e.g. clear variable names, coherent spacing)
+3.  Your answer must appear under the relevant question
+4.  Answer in the clearest way
+
+#### Question 1:
+
+Generate a data frame that summarizes the number of mass shootings per year. Print the data frame as a formatted `kable()` table.
+
+#### Question 2:
+
+Generate a bar chart that identifies the number of mass shooters associated with each race category. The bars should be sorted from highest to lowest.
+
+#### Question 3:
+
+Generate a boxplot visualizing the number of total victims, by type of location. Redraw the same plot, but remove the Las Vegas Strip massacre from the dataset.
+
+#### Question 4:
+
+Generate a plot that answers the following question: How many white males with prior signs of mental illness initiated a mass shooting after 2000?
+
+#### Question 5:
+
+Generate a plot that answers the following question: Which month of the year has the most mass shootings?
+
+#### Question 6:
+
+How does the distribution of mass shooting fatalities differ between White and Black shooters? What about White and Latino shooters?
+
+#### Question 7 (open question):
+
+Are mass shootings with shooters suffering from mental illness different from mass shootings with no signs of mental illness in the shooter? Assess the relationship between mental illness and total victims, mental illness and location type, and the intersection of all three variables. When possible, answer with data visualization.
+
+```{r}
+library(tidyverse)
+data = read.csv("shootings.csv")
+
+data_filtered = data %>%
+  filter(prior_signs_mental_health_issues == "yes")
+
+data$prior_signs_mental_health_issues = tolower(data$prior_signs_mental_health_issues)
+  
+data = data %>%
+filter(prior_signs_mental_health_issues %in% c("yes","no"))
+
+ggplot(data, aes(prior_signs_mental_health_issues, fatalities)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Fatalities by Prior Mental Helath",
+       x = "Prior mental health issues",
+       y = "Number of fatalities") +
+  theme_minimal() 
+  
+```
+
+```{r}
+ggplot(data, aes(x = prior_signs_mental_health_issues,
+                 y = fatalities, 
+                 fill = prior_signs_mental_health_issues)) +
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0, 20), 
+                     breaks = seq(0, 20, by = 5)) +
+  scale_fill_brewer() +
+  labs(title = "Distribution of Fatalities by Prior Mental Helath",
+       x = "Prior mental health issues",
+       y = "Number of fatalities") +
+  theme_minimal() 
+```
