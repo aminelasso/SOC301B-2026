@@ -72,18 +72,29 @@ _Week 1: Getting started with R/R Studio_
 
 _Week 2: Descriptive statistics and data visualization_
 
-* Lecture: Fundamentals of data visualization; ggplot grammar; version control with Git/Github; difference between Description, Inference and Causality
+* TD: Data visualization (Mass shooting dataset)
+* Learning outcomes: 
+  * Produce a clean .html document with Quarto
+  * Descriptive analysis of key variables
+  * Data visualization with ggplot
 * Mandatory readings: Chapters 2.1-2.6 of Modern Statistics with R: <https://modernstatisticswithr.com/> + create Github account
 * Mandatory videos: https://www.youtube.com/watch?v=0oc49DyA3hU and https://www.youtube.com/watch?v=vemZtEM63GY
 * Optional readings: Chapters 2.7-2.8 of Modern Statistics with R: <https://modernstatisticswithr.com/>
 
 _Week 3: Data transformation_
 
-* TD: Analyzing data from a real behavioral experiment (learning outcomes: data cleaning & data transformation fundamentals with dplyr)
+* TD: Analyzing data from a real behavioral experiment (The Short or Long game)
+* Learning outcomes:
+  * Data cleaning, data transformation and joining with dplyr (R)
+  * Analyze experiments with repeated measures
 * Mandatory readings: Sections 5 and 19 of R for data science: <https://r4ds.hadley.nz>
 
 _Week 4: Introduction to the General Linear Model_
-* Lecture and class exercises: General Linear Model; OLS regression; multiple regression; coefficient; statistical inference
+* TD: applying the General Linear Model to interpret data
+* Learning outcome: 
+  * Run and interpret General Linear Model and OLS regression in behavioral data
+  * Use DAGs to specify a linear model and choose controls
+  * Properly interpret the inferential part of linear regressions
 * Mandatory readings:
     * Watch the following videos in order:
         * https://www.youtube.com/watch?v=7cSArk7tU4w
@@ -92,7 +103,11 @@ _Week 4: Introduction to the General Linear Model_
     * Read Sections 3 to 4.2 (included) of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/ (section 4.3 is optional)
 
 _Week 5: Generalized linear models, mixed models and ANOVA_
-* Lecture and class exercises: generalized linear model; logistic regression; interpreting odds ratio; multilevel data; linear mixed model; ANOVA
+* TD: applying logistic regressions, mixed models and ANOVA to the behavioral data
+* Learning outcomes: 
+  * Run and properly interpret logistic regressions and odds ratio while avoiding common pitfalls
+  * Identify multilevel data and its challenges and properly using linear mixed models in the process
+  * Run and properly interpret ANOVAs
 * Mandatory readings:
     * Watch the following videos in order
         * On generalized linear models: Videos 1-6 from this playlist: https://youtube.com/playlist?list=PLblh5JKOoLUKxzEP5HA2d-Li7IJkHfXSe&si=wad7IsGlApLWXikD
@@ -103,35 +118,56 @@ _Week 5: Generalized linear models, mixed models and ANOVA_
 
 _Week 6: Oral presentations: research report 1 in one graph_
 
-Each student briefly presents their RR1 results with one graph. No reading notes. 
+Each student briefly presents their RR1 results with one graph. No reading notes. 5 minute presentation + 1 question from the audience. 
+To ensure maximum attention, the use of laptops by the audience is forbidden in this class. 
 
 _Week 7: Regressions: common mistakes_
 
-* Lecture and class exercises on assumption checks, robust standard errors, visualizing linear and logistic regressions, dealing with ordinal variables
+* TD: Identifying common mistakes in the use of linear and logistic regressions
+* Learning outcomes: 
+  * Run and interpret assumption checks and run robust standard errors
+  * Recognize collider bias and other issues in multiple regressions
+  * Visualizing linear and logistic regressions to anticipate issues
+  * Deal with ordinal variables
 * Mandatory readings: TBD
 
-_Week 8: Sampling_
+_Week 8: Causal inference_
 
-* Lecture and class exercises: sampling methods; sampling bias and correction; power analysis and sample size
+* TD: Implement causal inference techniques in behavioral data
+* Learning outcomes: 
+  * Understand the logic behind the main causal inference methods: experiments, difference-in-difference, statistical matching, instrumental variable
+  * Run a regression discontinuity design
 * Mandatory readings: TBD
 
 _**Week 9: MIDTERM EXAM**_
 
-2 hours. The midterm exam will be a pen-and-paper exercise and consist in two main types of exercises. One section will test your ability to comment on and interpret a data analysis project from A to Z. You will be asked a series of questions designed to test your programming abilities, statistical reasoning, and your general skills regarding data analysis (e.g., how to make data analysis decisions and interpret results). A second type of exercises will test more specific knowledge, by exposing you to specific cases. You will be presented with specific situations, data analysis decisions, or chunks of code, and you will be asked to answer questions about them.
+2 hours. The midterm exam will be a pen-and-paper exercise and consist in two main types of exercises. One section will test your ability to comment on and interpret a data analysis project from A to Z. You will be asked a series of questions designed to test your programming abilities, statistical reasoning, and your general skills regarding data analysis (e.g., how to make data analysis decisions and interpret results). A second type of exercises will test more specific knowledge, by exposing you to a series of isolated data analysis decisions. You will be presented with specific situations, data analysis decisions, or chunks of code, and you will be asked to answer questions about them.
 
 _Week 10: Sensitivity analysis_
 
-* Lecture and class exercices: missing values, outliers, model selection, and sensitivity checks
+* TD: Auditing a dataset
+* Learning outcomes: 
+  * Quantify missing values, understand the biases they can create, and use imputation methods to solve them
+  * Identify outliers in data
+  * Compute Aikake's Information Criteria (AIC) and Lasso regression for model selection
+  * Run sensitivity checks to test the robustness of findings
 * Mandatory readings: Sections 8 and 9 of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/
 
 _Week 11: Predictive modeling (1)_
 
-* Lecture and class exercises: Overfitting and the bias-variance trade-off; Out-of-sample prediction vs. in-sample explanation; Cross-validation techniques; Regression and classification
+* TD: Using a model to predict the future
+* Learning outcomes:
+  * Master key concepts in predictive modeling: overfitting and the bias-variance trade-off; out-of sample prediction; test-train split; cross-validation; regression and classification
+  * Implement predictive modeling and cross-validation using the caret package in R
 * Mandatory reading: TBD
 
 _Week 12: Predictive modeling (2)_
 
-* Lecture and class exercises: Penalized models (esp. Lasso regression); Regularization and automatic variable selection; Hyperparameter tuning: selecting the optimal penalty ( λ ); Predicting categories: the case of classification and the confusion matrix
+* TD: Classification models and regularization
+* Learning outcomes: 
+  * Master key concepts in classification: confusion matrix; precision, recall and F1 score; ROC and AUC
+  * Master key concepts in regularization: penalty, ridge regression, lasso regression, hyperparameter tuning, automatic variable selection...
+  * Implement classification models in behavioral data
 
 **30/11, 9AM: SUBMIT RESEARCH REPORT 2**
 
@@ -146,10 +182,12 @@ Students present the main findings of RR2 in front of a jury; with an emphasis o
 * Final exam: 40%
 
 * Continuous Assessment: 20%
-    * Research Report 1: 10%
-    * Research Report 2: 10%
+    * Research Report 1: 10%. One quarter of the RR1 grade comes from the oral presentation on Week 6.
+    * Research Report 2: 10%. One quarter of the RR2 grade comes from the oral presentation on Week 13.
 
-* Participation, Contribution & Engagement: 10% 
+* Participation, Contribution & Engagement: 10%. 
+  * 50% of the grade comes from the average grade from the weekly short tests. 
+  * 50% of the grade comes from students' active engagement during the classes. 
 
 ### Main references
 
