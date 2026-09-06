@@ -1,5 +1,5 @@
 ---
-title: "Exercises Week 2"
+title: "TD  Week 2: Mass Shooting"
 format: 
   html:
     self_contained: true
@@ -7,98 +7,167 @@ format:
     embed-resources: true
 execute:
   echo: true
+  output: false
   warning: false
   message: false 
   error: false
 editor: visual
 ---
 
-*You can find useful tutorials in Section 2 of this handbook: <https://modernstatisticswithr.com/>*
-
-## Context
+# Context
 
 The United States experiences far more mass shooting events than many other developed country in the world. While policymakers, politicians, the media, activists, and the general public recognize the widespread prevalence of these tragic events, policies intended to stop these events should be grounded in evidence and empirical data.
 
-In July 2012, in the aftermath of a mass shooting in a movie theater in Aurora, Colorado, [Mother Jones](https://www.motherjones.com/politics/2012/07/mass-shootings-map/) published a report on mass shootings in the United States since 1982. Importantly, they provided the underlying data set as [an open-source database](https://www.motherjones.com/politics/2012/12/mass-shootings-mother-jones-full-data/) for anyone interested in studying and understanding this criminal behavior.
+In July 2012, in the aftermath of a mass shooting in a movie theater in Aurora, Colorado, [Mother Jones](https://www.motherjones.com/politics/2012/07/mass-shootings-map/) published a report on mass shootings in the United States since 1982. Importantly, they provided the underlying dataset as [an open-source database](https://www.motherjones.com/politics/2012/12/mass-shootings-mother-jones-full-data/) for anyone interested in studying and understanding this criminal behavior.
 
-## Dataset
+# Instructions (read carefully!)
 
-Load this dataset using the read.csv() function.
+In this TD, you will critically analyze this dataset and identify interesting patters in the prevalence of mass shootings in the United States. Follow these guidelines:
+
+- Submit this TD as one .qmd document and its rendered .html document on Canvas by the end of this session.
+
+- You are **not allowed to use AI at all** throughout the duration of this TD. If you're stuck, don't hesitate to reach out to Zakia or myself
+
+- Code must appear, but not warning messages and console outputs
+
+- Code must be well-commented and clearly written (e.g. clear variable names, coherent spacing)
+
+- Write properly. I don't mean grammar or orthograph, I mean: make sure that it's easy, clear and pleasant to read you. The best tip I can give is to imagine a classmate reading your paper: would they understand easily? would everything be clear?
+
+# Exercises
+
+## Part 1: The R Studio workflow
+
+When you analyze data, you should make sure to centralize anything you need in one file, called the **working directory**. This is the file where you'll have your scripts, your dataset, other relevant files, and any file that is produced from your scripts (e.g. graphs, .html files rendered from Quarto...).
+
+*Step 1: Create a working directory*
+
+You can do this in R Studio if you click on "File", then "New Project"; then "New Directory" and "New Project". Click on "Browse" and select the file in which you want to be working. This will be your directory!
+
+Create a working directory for this TD in your laptop file (ideally: inside a larger file dedicated to this class).
+
+*Step 2: Set the working directory*
+
+Using the method seen in the beginning of this class, ensure that your file is indeed defined as the current working directory. To make sure that it worked, run this code afterwards:
+
+```{r}
+getwd()
+```
+
+If you're not sure what this does, type ?getwd in the console to have more info on this function.
+
+*Step 3: Open a .qmd file*
+
+Go to "File", "New File", then open a Quarto document. Choose a file name but generally you can keep all default options. This is the .qmd file you will be working with during this TD.
+
+*Step 4: Write the YAML*
+
+The file opens with the default YAML. Replace it with the template from this .qmd file.
+
+*Step 5: Load the dataset*
+
+You will find a dataset called *shootings.csv* on my [Github repository for this class](https://github.com/aminelasso/SOC301B-2026), under the file called Week 1. Download it inside the working directory. Then add this chunk of code and run it:
 
 ```{r}
 library(tidyverse)
-library(knitr)
 data = read.csv("shootings.csv")
+str(data)
 ```
 
-## Exercises
+*Step 6: Test whether "Render" works*
 
-*Note: the assignment must be returned in the perfect format:*
+Click on the "Render" button above. Make sure that it works well. You should see a .html document with a title, a chunk of code, but no output.
 
-1.  Code must appear, but not warning messages and console outputs
-2.  Code must be well-commented and clearly written (e.g. clear variable names, coherent spacing)
-3.  Your answer must appear under the relevant question
-4.  Answer in the clearest way
+**NB: Once you have completed this step, call Zakia or myself before moving on to the next Section.**
+
+## Part 2: Inspect the dataset
 
 #### Question 1:
 
-Generate a data frame that summarizes the number of mass shootings per year. Print the data frame as a formatted `kable()` table.
+Click on the "data" dataset in the environment on the right-hand side of R Studio. What does each row represent?
 
 #### Question 2:
 
-Generate a bar chart that identifies the number of mass shooters associated with each race category. The bars should be sorted from highest to lowest.
+Look at the location.1 column. According to you, what does this variable tell us? Pay attention to the first rows: is there anything that we should worry about if we use this for analysis?
 
 #### Question 3:
 
-Generate a boxplot visualizing the number of total victims, by type of location. Redraw the same plot, but remove the Las Vegas Strip massacre from the dataset.
+These are five functions (or combination of functions) that you can use to take a general look at a dataset and make crucial checks. **Memorize them**, and I recommend that you always use at least one of them before you start any analysis.
+
+Run them all. In one sentence, explain what each one does. Which one do you think is more useful?
+
+```{r}
+str(data)
+glimpse(data)
+summary(data)
+sum(duplicated(data)) # Looks at the number of "duplicates" in the data
+colSums(is.na(data)) # Check for missing values
+```
 
 #### Question 4:
 
-Generate a plot that answers the following question: How many white males with prior signs of mental illness initiated a mass shooting after 2000?
+Perhaps the first question you should ask when analyzing a dataset is: how was the dataset built, and what do the variables represent? This is crucial to properly interpret the results.
+
+First and foremost, make a quick search on the Internet: what is Mother Jones, the entity behind this dataset? Answer briefly. Why could this be important in the way we interpret the data?
 
 #### Question 5:
 
-Generate a plot that answers the following question: Which month of the year has the most mass shootings?
+Read this short piece written by the journalists who constructed this dataset: <https://www.motherjones.com/politics/2012/07/mass-shootings-map/>
+
+*5A: How is mass shootings defined; did the definition change over time; and how does it affect data interpretation?*
+
+*5B: What important information is lacking here, and for which you should ask for more details?*
+
+**NB: Once you have completed this step, call Zakia or myself before moving on to the next Section.**
+
+## Part 3: Analyzing the data
+
+*You will find useful tutorials to answer the following questions in Chapters 2.6-2.8 of Modern Statistics with R: <https://modernstatisticswithr.com/>*
 
 #### Question 6:
 
-How does the distribution of mass shooting fatalities differ between White and Black shooters? What about White and Latino shooters?
+*6A:*
 
-#### Question 7 (open question):
+Generate a data frame that summarizes the number of mass shootings per year. Print the data frame as a formatted `kable()` table. *NB: To accomplish this objective, you will need to use group_by() and count().*
 
-Are mass shootings with shooters suffering from mental illness different from mass shootings with no signs of mental illness in the shooter? Assess the relationship between mental illness and total victims, mental illness and location type, and the intersection of all three variables. When possible, answer with data visualization.
+*6B:*
 
-```{r}
-library(tidyverse)
-data = read.csv("shootings.csv")
+Sometimes in data analysis, we want to transform a continuous variable, like age, into a binary variable (e.g. "Child"/"Adult"). A common way to do so is to perform a *median split*.
 
-data_filtered = data %>%
-  filter(prior_signs_mental_health_issues == "yes")
+Perform a median split on age, and print a kable function showing the mean number of victims for murderers above and below the median.
 
-data$prior_signs_mental_health_issues = tolower(data$prior_signs_mental_health_issues)
-  
-data = data %>%
-filter(prior_signs_mental_health_issues %in% c("yes","no"))
+*6C:*
 
-ggplot(data, aes(prior_signs_mental_health_issues, fatalities)) +
-  geom_boxplot() +
-  labs(title = "Distribution of Fatalities by Prior Mental Helath",
-       x = "Prior mental health issues",
-       y = "Number of fatalities") +
-  theme_minimal() 
-  
-```
+Sometimes in data analysis we want to *subset* the data: keep only rows from a certain category. In R, this is usually done with the *filter()* function. Write the same table as in 6B; except that it only shows the number for White people.
 
-```{r}
-ggplot(data, aes(x = prior_signs_mental_health_issues,
-                 y = fatalities, 
-                 fill = prior_signs_mental_health_issues)) +
-  geom_boxplot() +
-  scale_y_continuous(limits = c(0, 20), 
-                     breaks = seq(0, 20, by = 5)) +
-  scale_fill_brewer() +
-  labs(title = "Distribution of Fatalities by Prior Mental Helath",
-       x = "Prior mental health issues",
-       y = "Number of fatalities") +
-  theme_minimal() 
-```
+#### Question 7:
+
+Generate a bar chart that identifies the number of mass shooters associated with each race category. The bars should be sorted from highest to lowest.
+
+#### Question 8:
+
+Generate a boxplot visualizing the number of total victims, by type of location.
+
+#### Question 9:
+
+Generate a plot that answers the following question: How has the total number of victims of mass shootings evolve over time ?
+
+#### Question 10:
+
+How does the distribution of mass shooting fatalities differ between White and Latino shooters? Add facets to your plot to show the difference in distributions.
+
+#### Open question:
+
+Define a research question using the criteria we learned about:
+
+- Define a strong research question
+
+- Define at least two credible, competing hypotheses, state which one you favor and why
+
+- Define the prediction that each hypothesis makes on a conceptual level
+
+- Define the same prediction on an *operational* level
+
+- Test the prediction using the data
+
+- Visualize the finding
