@@ -87,7 +87,7 @@ _Week 3: Data transformation_
 * Learning outcomes:
   * Data cleaning, data transformation and joining with dplyr (R)
   * Analyze experiments with repeated measures
-* Mandatory readings: Sections 5 and 19 of R for data science: <https://r4ds.hadley.nz>
+* Mandatory readings: Sections 1, 3 & 5 of R for data science: <https://r4ds.hadley.nz>
 
 _Week 4: Introduction to the General Linear Model_
 * TD: applying the General Linear Model to interpret data
@@ -149,7 +149,7 @@ _Week 10: Sensitivity analysis_
 * Learning outcomes: 
   * Quantify missing values, understand the biases they can create, and use imputation methods to solve them
   * Identify outliers in data
-  * Compute Aikake's Information Criteria (AIC) and Lasso regression for model selection
+  * Compute Akaike's Information Criteria (AIC) and Lasso regression for model selection
   * Run sensitivity checks to test the robustness of findings
 * Mandatory readings: Sections 8 and 9 of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/
 
