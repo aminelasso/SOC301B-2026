@@ -96,10 +96,7 @@ _Week 4: Introduction to the General Linear Model_
   * Use DAGs to specify a linear model and choose controls
   * Properly interpret the inferential part of linear regressions
 * Mandatory readings:
-    * Watch the following videos in order:
-        * https://www.youtube.com/watch?v=7cSArk7tU4w
-        * https://www.youtube.com/watch?v=wUT1qstylFQ
-        * https://www.youtube.com/watch?v=IXYDMMBisr8
+    * Watch all Statquest videos from this playlist: https://www.youtube.com/watch?v=aFDOzpTeg0s&list=PLblh5JKOoLUIzaEkCLIUxQFjPIlapw8nU
     * Read Sections 3 to 4.2 (included) of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/ (section 4.3 is optional)
 
 _Week 5: Generalized linear models, mixed models and ANOVA_
