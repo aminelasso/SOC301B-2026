@@ -1,0 +1,137 @@
+---
+title: "Guidelines for RR1"
+format: 
+  html:
+    from: markdown+task_lists
+    self_contained: true
+    toc: true
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false 
+  error: false
+editor: visual
+---
+
+Please refer to this guideline as you complete RR1. Go through each item in this checklist and make sure your paper ticks every box before submitting. Every item is graded.
+
+## Grading
+
+### Formatting (4 pts)
+
+- [ ] The submission consists in a **properly rendered .html file** (make sure it renders well on other computers) and a **.qmd file**
+
+- [ ] The code appears in the .html file
+
+- [ ] Only the outputs you actually use appear in the rendered file: no leftover raw `summary()` printouts, no error messages, no warnings, no chunks that were only there for you to inspect while writing
+
+### Clarity of presentation (8 pts)
+
+*Introduction*
+
+- [ ] The paper starts with a **general question** and situates it within a **debate** in the social sciences
+
+- [ ] The paper explains **why the question matters** in one or two sentences (real-world stakes or theoretical puzzle)
+
+- [ ] The paper lays out **at least two competing mechanisms** — one for each side of the debate — and explains what each side specifically predicts about your focal variable
+
+- [ ] The paper states the **point of disagreement**: one sentence naming what the two sides predict *differently*. If they don't predict differently, the debate isn't real and you need to reformulate
+
+- [ ] The paper formulates a **conceptual research question**
+
+- [ ] The paper describes the **dataset in detail**: what it contains, how it was accessed, its main shortcomings
+
+- [ ] The paper describes each of the **variables used**, and — for each one — explicitly names the **gap between the theoretical construct and the operationalized variable** (what does the measured variable capture well? what does it miss?)
+
+- [ ] The paper formulates an **operationalized research question** that follows from the conceptual one and the variables available
+
+- [ ] The paper states which hypothesis you **favor going in**, and proposes a concrete mechanism for why (not just a preference)
+
+- [ ] The paper identifies the **intended audience** and states what **contribution** it intends to make. Only name one audience: don't make a list.
+
+*Writing*
+
+- [ ] Full, clear sentences. No bullet points.
+
+- [ ] The writing **flows**: the reader is never lost and always understands why you're moving from one step to the next
+
+- [ ] The writing is **parsimonious**: only relevant information appears. No redundancies, no useless outputs, no useless error messages
+
+- [ ] Every **data analysis decision** — from data cleaning to statistics (filtering the sample, creating a variable, choosing a control, splitting a distribution, using a transformation) — is explicitly flagged in a dedicated box (just like in the Spotify Template) and justified in one or two sentences
+
+*Plots and tables*
+
+- [ ] Every **figure and table has a number, a short title, and a detailed legend** describing what is being shown (what the axes are, what the dots represent, what the colors mean, what any fitted line is, sample size). Legends should be comprehensive but written in plain language, not jargon
+
+- [ ] Every figure and table is **referenced in the text** (e.g. "as shown in Figure 3...")
+
+- [ ] Data is adequately visualized: plots are easy to understand and rapidly communicate the point you want to make
+
+- [ ] Graphs are **aesthetically pleasing** with colors (ideally, but not mandatorily, colorblind-friendly)
+
+- [ ] Tables appear as **clean tables** (e.g. using `knitr::kable()` or `modelsummary()`), never as raw output
+
+- [ ] Regressions need to appear in regression tables (see Spotify Template for an example)
+
+*Code*
+
+- [ ] Code is **well-commented**. Each step is detailed in a clear way. Someone who is not familiar with R can read your code and understand what it does
+
+*Discussion*
+
+- [ ] The paper states the **main result** clearly
+
+- [ ] The paper draws out **implications** — what the finding means beyond the specific analysis; and the implications are targetted at the target audience you had identified in the beginning.
+
+- [ ] The paper identifies **limitations** and proposes **specific avenues for future research** (not generic "more research is needed" — propose a concrete next study)
+
+**The best way to check your clarity of presentation is to have your paper read by someone who's never heard of your project. Are they able to immediately understand your research just by reading it?** This is how I will grade you. So don't write assuming things I already know about your project.
+
+### Quality of analysis (8 pts)
+
+*Hypotheses*
+
+- [ ] The paper formulates **at least one clear, testable and justified hypothesis** — with an explicit statement of what would falsify it
+
+NB: if you put forth several hypotheses, you should test each one following the criteria below.
+
+- [ ] The hypotheses are **properly justified**: they don't seem like random questions
+
+- [ ] The hypotheses are **interesting** (or at least you make them seem interesting): you show how they ask something meaningful about human behavior or social patterns
+
+*Descriptive statistics*
+
+- [ ] The paper describes the **distribution of each variable of interest** (at least the predictor and the outcome) using data visualization (e.g. a histogram)
+
+- [ ] The paper checks whether the variables have any **unusual shape** (skew, heavy tails, bimodality, floor/ceiling effects) and, if so, comments on what it means for the analysis
+
+- [ ] The paper provides an **initial descriptive check** of the hypothesis by visualizing the relation between the predictor and the outcome (e.g. if the predictor is categorical, plot the distribution of the outcome in each category)
+
+- [ ] The paper concludes as to whether the initial descriptive analysis lends support to the hypothesis or not
+
+*Inferential statistics*
+
+- [ ] The paper uses an inferential method to test the hypothesis (e.g. a linear regression)
+
+- [ ] The paper **explains what the statistical model does** in accessible terms (e.g. if you use a logistic regression, briefly say what it is)
+
+- [ ] Every **statistical decision** is justified in a clear way (e.g. why this model, not another one? why this control variable?)
+
+- [ ] \[*OPTIONAL- for students who are already familiar with this only*\] The paper **checks the assumptions** of the model (e.g. for a simple linear regression: normal distribution of residuals, homoskedasticity)
+
+- [ ] The paper clearly **separates descriptive results from inferential results**: descriptive = estimates in the sample (coefficients, R²); inferential = what we can say about the population beyond the sample (p-value, confidence interval)
+
+- [ ] The paper **interprets every key statistic**: intercept, coefficient, p-value, confidence interval, and R²
+
+- [ ] The paper **properly interprets the p-value**: it states clearly what the null hypothesis is, and what "rejecting the null" does (and does not) allow us to conclude
+
+- [ ] The paper differentiates between the description of effect sizes and statistical inference (esp. p-value). Students must show that they understand that a low p-value does not necessarily mean a meaningful effect.
+
+- [ ] The paper **properly shows the outputs of the model** as a clean regression table (e.g. using `modelsummary()`), never as a raw R output
+
+- [ ] The analyses **actually and explicitly test** your hypotheses. Explain why you think the model you chose answers your research question. When you have run your model, state explicitly whether you think the results support your hypothesis or not, and why
+
+- [ ] Your **interpretation is consistent with your analyses**
+
+**NB: I will not grade you based on whether your results confirm your initial hypotheses. What matters is the quality of the conclusions you draw.**

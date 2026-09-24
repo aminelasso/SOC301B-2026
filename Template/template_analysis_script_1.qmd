@@ -1,47 +1,110 @@
 ---
 title: "Are happy songs more popular? A case study with Spotify data"
-format: html
+format: 
+  html:
+    self_contained: true
+    toc: true
+    embed-resources: true
+execute:
+  echo: true
+  output: true
+  warning: false
+  message: false 
+  error: false
 editor: visual
-author: Amine Sijilmassi
-date: Fall 2026
 ---
 
 ### Introduction
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = FALSE,        # Don't show R code
-  results = "hide",    # Don't show output by default
-  message = FALSE,     # Hide messages (e.g., from library calls)
-  warning = FALSE      # Hide warnings
-)
-```
 
 ```{r}
 rm(list=ls())
 # Load
 library(tidyverse)
 library(patchwork)  # This library combines plots easily
+library(modelsummary)
 dataset = read_csv("spotify_songs.csv")
 ```
 
-Why do people love music? A major debate in the social sciences is whether musical taste results from universal biological and cognitive features of our species or from the specific historical and cultural conventions of genres and scenes. On the universalist side, researchers have documented cross-cultural regularities in music, suggesting general psychological mechanisms make certain acoustic properties broadly appealing (Mehr et al., 2019). On the contextualist side, sociologists of culture have argued that a song's success depends on how its features relate to the norms and conventions of its genre, so what "sounds good" is genre-relative rather than universal (Frith, 1996).
+**General question:**\
+Why do people love music?
 
-We focus on valence (a song's musical positivity) because it is a feature about which the two traditions make interestingly divergent predictions.
+**Debate:**\
+A major debate in the social sciences is whether musical preferences stems from universal biological and cognitive features of our species, or from the specific historical and cultural conventions of genres and scenes. We focus on valence, a song's musical positivity, because it is a feature about which the two traditions make interestingly divergent predictions.
 
-For the universalist side, musical valence matters because positive-sounding acoustic cues (major mode, consonant harmonies, brighter timbres, moderate-to-fast tempi) engage general affective and reward mechanisms that operate similarly across listeners, so higher-valence songs should be more broadly appealing regardless of the genre they appear in.
+**Why this matters:**\
+If musical appeal relies on universal features, then platforms, artists, and policymakers can rely on general principles of what "works" acoustically. If it is genre-relative, then the same acoustic feature can help one song and hurt another, and any attempt to model taste without accounting for genre will be misleading, both scientifically and in applied settings like recommendation systems.
 
-For the contextualists, valence matters only through the lens of genre conventions: each genre has developed, over its history, its own norms about what an emotionally appropriate song sounds like: dance-oriented genres reward high positivity because their function is collective celebration, while introspective genres like R&B or certain rock traditions value lower valence because melancholy and vulnerability are part of what audiences come to those genres for. On this view, the "right" level of valence is genre-relative, and the same acoustic positivity that helps a pop song succeed can make an R&B track feel generic or inauthentic.
+**Mechanisms (each side):**
 
-**Research question (conceptual):** Is the appeal of musical positivity a general psychological phenomenon, or is it shaped by genre-specific conventions?
+*Mechanism 1: Universalist:*\
+On the universalist side, researchers have documented cross-cultural regularities in music, suggesting that general psychological mechanisms make certain acoustic properties broadly appealing (Mehr et al., 2019). Applied to valence, this view would argue that positive-sounding acoustic cues (e.g. major mode, consonant harmonies, brighter timbres, moderate-to-fast tempi) engage general affective and reward mechanisms that operate similarly across listeners. Higher-valence songs should therefore be more broadly appealing, regardless of the genre they appear in.
 
-**Research question (operationalization):** Does the association between valence and track popularity in the Spotify dataset hold uniformly across genres, or does it vary substantially?
+*Mechanism 2: Contextualist:*\
+On the contextualist side, sociologists of culture have argued that a song's success depends on how its features relate to the norms and conventions of its genre: so what "sounds good" is genre-relative rather than universal (Frith, 1996). Applied to valence, this view argues that each genre has developed its own norms about what an emotionally appropriate song sounds like. Dance-oriented genres might reward high positivity because their function is collective celebration; introspective genres like R&B or certain rock traditions value negative valence because melancholy and vulnerability are part of what audiences come to those genres for. On this view, the "right" level of valence is genre-relative, and the same acoustic positivity that helps a pop song succeed can make an R&B track feel awful.
 
-**H1 (universalist):** Valence has a positive association with track popularity across genres
+**Point of disagreement:**\
+The universalist view predicts that valence has the same positive effect on popularity in every genre, while the contextualist view predicts that the direction of the valence–popularity relationship depends on which genre the song belongs to.
 
-**H2 (contextualist):** The valence–popularity relationship varies significantly across genres
+**Research question (conceptual):**\
+Is the appeal of musical positivity a general psychological phenomenon, or is it shaped by genre-specific conventions?
 
-**Expected public for this sheet of paper:** I am writing this paper for an audience of social scientists interersted in the question of the universality of musical taste—researchers like Samuel Fehr and Manvir Singh. I intend to make a contribution in this field, by showing that musical features are not universally appealing, through the example of valence.
+**Dataset**
+
+To answer this question, I use the *Spotify Songs* dataset, a publicly available dataset accessed via Kaggle (originally scraped by the user *joebeachcapital* using the Spotify Web API and the `spotifyr` R package). The dataset contains 32,833 rows corresponding to tracks described by 23 variables, covering 6 broad genres (pop, rap, rock, latin, R&B, EDM) further divided into subgenres.
+
+Before starting my analysis, I need to flag some limitations of the data.
+
+First*,* the tracks are not a representative sample of music, nor even of music on Spotify: they were collected from a curated set of Spotify playlists organized by genre. This means the sample overrepresents tracks that Spotify's editors chose to include on genre playlists, and underrepresents tracks that exist on the platform but are not playlisted. The sample is therefore biased toward music that is already commercially visible.
+
+Second*,* the six genre categories (pop, rap, rock, latin, R&B, EDM) are narrow and Western-commercial. Entire musical traditions, like traditional, folk, classical, non-Western popular music, are absent. Any claim I make about "genres" here is really a claim about these six commercial categories.
+
+Third*,* the `track_popularity` score is a proprietary Spotify metric whose formula is not public. Spotify's documentation states it is based on total play counts weighted by recency, but the exact weighting is unknown.
+
+::: callout-caution
+## Data analysis decision
+
+The dataset is delivered with some tracks appearing on more than one playlist, and therefore in more than one row (sometimes with different genre labels, because genre is a playlist-level information). I do not deduplicate them, since the genre label is defined at the playlist level and dropping duplicates would force me to arbitrarily assign each track to a single genre. The cost of this approach is that our data is artificially inflated with duplicates. I found 4477 duplicate tracks, representing 13.6% of the dataset, which is substantial. Future sensitivity analyses should replicate the results without these duplicates.
+:::
+
+**Variables**
+
+This dataset lets me answer my conceptual research question because it contains three variables that map, even imperfectly, onto the three concepts at the heart of my question: valence, musical appeal, and genre. I describe each in turn, with the gap between the theoretical construct and the operationalized variable stated explicitly.
+
+**`valence` (predictor: operationalization of "valence").** A continuous variable ranging from 0 to 1, produced by Spotify's audio analysis algorithm. According to Spotify's official documentation, valence describes "the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g., happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g., sad, depressed, angry)." The score is computed algorithmically from acoustic features (mode, tempo, timbre, harmonic content). Although we lack more specific details, the algorithm was validated by comparing its performance to a sample of human listeners. The algorithm was found to rate a track's valence similarly to humans, but can sometimes make mistakes. The exact performance of the algorithm is not available, so we cannot correct for its potential bias in the study. For now, let's just note that the measure of valence mirrors general human perceptions of valence but is imperfect.
+
+The theoretical construct of "musical positivity" in the debate I engage with refers to the general feeling elicited by a track. But Spotify's `valence` is an algorithmic estimate based on acoustic features alone. It does not capture lyrical content: in theory, a happy melody with dark lyrics would score high; nor video clips and album imagery. It is best understood as a proxy for the *acoustic* dimension of positivity, not the full experience of it.
+
+**`track_popularity` (outcome: operationalization of "musical appeal").** An integer variable ranging from 0 to 100, computed by Spotify based on total play counts weighted by recency of plays. A first limitation is that the exact weighing method is not reported, but the idea is that recent plays count more than older plays. In sum, this variable does not capture the lifetime popularity of a song, but more how popular it is in recent time.
+
+*Gap between construct and variable:* the theoretical construct I care about is *appeal*: the extent to which listeners find a song attractive. `track_popularity` measures *observed streaming behavior on Spotify*. I believe that, because Spotify is such an important streaming platform, the popularity of a song on Spotify is likely to reflect how much it's enjoyed. But there are biases: a track's popularity on Spotify also depends on other things than it's pure musical appeal, like what Spotify's recommendation algorithm surfaces, which artists have marketing and playlist-placement resources, regional availability, and the recency weighting itself, which penalizes older songs regardless of their appeal. A song can be widely appealing without being popular in this operational sense (e.g., an older track no longer being pushed by recommendations), and a song can be popular without being especially appealing (e.g., a track boosted by aggressive playlist placement).
+
+**`playlist_genre` (moderator: operationalization of "genre").** A categorical variable with six levels: `pop`, `rap`, `rock`, `latin`, `r&b`, `edm`. It reflects the genre label of the *playlist* on which the track was found, not an intrinsic property of the track itself.
+
+*Gap between construct and variable:* "genre" in the theoretical debate refers to a musical community with shared conventions, a history, and an audience with specific expectations. `playlist_genre` is a coarse commercial label assigned at the *playlist* level, meaning a track's genre in this dataset is determined by which playlist Spotify chose to place it on. Spotify does not share its methodology to attribute playlists to genre, thus the genre variable might have some degree of arbitrariness. Moreover, this list of 6 genres is narrow and Western-centric. Entire musical traditions, like traditional, folk, classical, non-Western popular music, are absent. Any claim I make about "genres" here is really a claim about these six commercial categories.
+
+::: callout-caution
+## Data analysis decision
+
+There are two variables in the dataset that capture the concept of "genre": genre and subgenre. I choose to select the genre variable. This is because my hypothesis doesn't require to go into the details of subgenre. The six genres in the dataset are very different from one another and have very different histories (e.g. rap and EDM), so they are sufficient to test whether strong contextual effects matter. In addition, this decision allows me to have more observations per category, which preserves statistical power.
+:::
+
+These variables will allow me to operationalize my research question.
+
+**Research question (operationalized):**\
+Does the association between valence and track popularity in the Spotify dataset hold uniformly across genres, or does it vary substantially across them?
+
+**Hypotheses:**
+
+*H1 (universalist):* Valence has a uniform positive association with track popularity across genres: it increases popularity for all genre in my sample.
+
+*H2 (contextualist):* The valence–popularity relationship varies significantly across genres, with some genres rewarding high valence and others rewarding low valence.
+
+**My favored hypothesis:**
+
+Before running the analysis, I favor the contextualist view. My reasoning is that because specific historical contexts are so determinant in the birth of music genre, listeners do not come to a genre looking for a generic "positive" song: they come with expectations shaped by that genre's history and function. For instance, someone putting on R&B is often seeking emotional vulnerability, and a high-valence track will feel out of place in that context.
+
+**Intended audience and contribution:**\
+I am writing this paper for social scientists interested in the cultural evolution of musical taste with a cognitive approach: researchers like Samuel Mehr and Manvir Singh. I intend to contribute to this debate by showing that musical features are not universally appealing, and need to consider contextual features, using valence as a case in point.
 
 ### Descriptive statistics (1): Description of the main variables of interest
 
@@ -90,6 +153,16 @@ p_combined = (p1 | p2)
 p_combined
 ```
 
+**Figure 1.** *Distributions of track popularity and valence.* Each bar represents the number of tracks (y-axis) falling within a given value range of the variable (x-axis). Left panel: track popularity, a Spotify-computed score from 0 to 100 based on total play counts weighted by recency (bin width = 1). Right panel: valence, a Spotify-computed score from 0 (sad) to 1 (happy) capturing the acoustic positivity of a track (bin width = 0.01). N = 32,833 tracks.
+
+Both variables of interest follow a roughly normal distribution, but popularity has an important spike around 0. This makes intuitive sense: there are many independent artists with a very small audience.
+
+::: callout-caution
+## Data analysis decision
+
+This spike around 0 popularity might influence my results. There is a possibility that valence might influence differently tracks with \~0 popularity compared to tracks that are around the average. For simplicity, and because non-normality of an outcome does not violate the assumptions of linear regressions, I'm keeping all tracks. But it would be good in future analyses to test whether our results hold when removing these outliers; or if the results are different in the least popular tracks.
+:::
+
 Note however that valence is not equally distributed across genres. As one could expect, some genres (e.g. latin) are significantly more positive than others.
 
 ```{r}
@@ -115,6 +188,8 @@ p3 = dataset %>%
 ```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
 p3
 ```
+
+**Figure 2.** *Average valence by genre.* Each bar represents the mean valence (y-axis) of all tracks belonging to a given genre (x-axis). Genres are ordered from lowest to highest mean valence. Colors distinguish genres and carry no additional meaning. Latin music has the highest average positivity; R&B and rock the lowest. N = 32,833 tracks across six genres.
 
 ### Descriptive statistics (2): Is valence related to popularity?
 
@@ -145,6 +220,8 @@ p4 = ggplot(dataset, aes(x = valence, y = track_popularity)) +
 p4
 ```
 
+**Figure 3.** *Relationship between valence and track popularity.* Each green dot represents one track, positioned by its valence (x-axis) and its popularity score (y-axis); transparency is used so that overlapping points appear darker. The dark line is the fitted linear regression of popularity on valence (ordinary least squares), and the surrounding gray band is its 95% confidence interval. The slope is slightly positive but the cloud of points is very wide, indicating that valence alone accounts for only a small share of the variation in popularity. N = 32,833 tracks.
+
 However, this relationship likely varies by genre. Different genres serve different emotional functions and attract distinct listener communities, so the valence-popularity relationship could look quite different across musical styles. Before examining genre-specific patterns, we should first verify that our dataset has adequate representation across genres. Table 1 confirms that sample sizes are reasonably balanced, with each genre containing between 4,800 and 6,000 tracks.
 
 ```{r}
@@ -159,6 +236,8 @@ dataset %>%
   rename(Genre = playlist_genre) %>%
   knitr::kable(align = c('l', 'r', 'r'))
 ```
+
+**Table 1.** *Distribution of tracks across genres.* Each row reports the number of tracks in the dataset that belong to a given genre (as coded by the `playlist_genre` variable) and the corresponding share of the total sample. N = 32,833 tracks.
 
 As expected, the relationship between track valence and popularity varies by genre. In particular, the relationship is especially pronounced for edm tracks; for which valence is significantly associated with popularity. By contrast, the relationship goes in the opposite direction for R&B tracks, with sad R&B songs more popular than happier ones. This makes intuitive sense: edm songs are usually played in a social, festive setting whereas the R&B genre generally revolved around intimate emotions.
 
@@ -177,14 +256,15 @@ p5 = ggplot(dataset, aes(x = valence, y = track_popularity, color = playlist_gen
   labs(title = "Valence vs Track Popularity by Genre",
        subtitle = "Relationship between musical positivity and popularity across different genres",
        x = "Valence (Musical Positivity)",
-       y = "Track Popularity",
-       caption = "Data source: Spotify API | Lines show linear trend with 95% CI") +
+       y = "Track Popularity") +
   theme_minimal()
 ```
 
 ```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
 p5
 ```
+
+**Figure 4.** *Valence vs. track popularity, by genre.* Each dot represents one track, positioned by its valence (x-axis) and its popularity score (y-axis). Dots are colored by the track's genre (as coded by `playlist_genre`); transparency is set very low (alpha = 0.01) so that individual points recede and only the density of tracks per region is visible. For each genre, a fitted linear regression line (ordinary least squares) shows the direction and strength of the valence–popularity association within that genre. The 95% confidence intervals are omitted for readability. The slopes vary substantially: EDM shows a clearly positive relationship, while R&B shows a clearly negative one. N = 32,833 tracks across six genres.
 
 Let us now look closer at the distribution of edm and R&B songs, to check whether these results are not driven by peculiar patterns for these variables. The figures below show that both variables follow a reasonably balanced normal distribution.
 
@@ -211,29 +291,166 @@ p6 = dataset %>%
 p6
 ```
 
+**Figure 5.** *Distribution of valence within EDM and R&B.* Each bar represents the number of tracks (y-axis) whose valence (x-axis) falls within a given range (30 bins across the 0–1 scale). The top panel shows tracks coded as EDM (light yellow) and the bottom panel shows tracks coded as R&B (light blue). Colors are used only to distinguish the two panels. Both distributions are reasonably balanced and roughly bell-shaped, suggesting that neither genre-specific result is driven by an unusual concentration of tracks at one end of the valence scale.
+
 ### Statistical inference
 
+We now test whether the patterns we observed descriptively hold up under formal statistical inference. To do this, we fit linear regression models predicting track popularity from valence, first on the whole dataset, and then separately within EDM and R&B, the two genres where the plot revealed the most striking differences.
+
+::: callout-note
+## Note
+
+For each model, you need to separate two things: **descriptive results** (the point estimates in *this* sample: the coefficients, the R²) and **inferential results** (what we can say about the population beyond our sample: the p-value, the confidence interval).
+
+Keeping these two levels separate is essential. A large coefficient with a large p-value means that we observe strong effects in our data but that we cannot generalize to the entire population; a small coefficient with a small p-value is a claim we can generalize, but one that may not matter in practice.
+:::
+
 ```{r}
-#Correlations
+#Before running the models, we define a small function that takes a fitted regression model and one of its terms, and returns a clean APA-formatted text with the coefficient, standard error, 95% confidence interval, t-statistic, degrees of freedom, and p-value. This spares us from writing the numbers by hand, which is where reporting errors usually come from, and guarantees the same format every time.
 
-# Overall correlation test
-cat("=== OVERALL ===\n")
-cor.test(dataset$track_popularity, dataset$valence)
+# report_lm_inline: takes a fitted lm() model and the name of one of its
+# terms (e.g. "valence"), and returns a single APA-style text with all
+# the numbers we need to report that coefficient in the text.
+#
+# We use sprintf("%.2f", ...) rather than round() because round() drops
+# trailing zeros (e.g. 12.80 becomes 12.8), which is not APA-conformant.
+# We rely on a helper format_p_val() defined elsewhere in the report
+# to format p-values (e.g. "p < .001" rather than "p = 0.0000001").
 
-# EDM correlation test
-cat("\n=== EDM ===\n")
-edm_data <- dataset %>% filter(playlist_genre == "edm")
-cor.test(edm_data$track_popularity, edm_data$valence)
+format_p_val <- function(p) {
+  if (is.na(p)) return("p = NA")
+  if (p < 0.001) return("p < .001")
+  p_fmt <- formatC(p, digits = 3, format = "f")
+  p_fmt <- sub("0\\.", ".", p_fmt) # Removes leading zero
+  return(paste0("p = ", p_fmt))
+}
 
-# R&B correlation test
-cat("\n=== R&B ===\n")
-rnb_data <- dataset %>% filter(playlist_genre == "r&b")
-cor.test(rnb_data$track_popularity, rnb_data$valence)
+report_lm_inline <- function(model, term) {
+  coefs   <- summary(model)$coefficients
+  est     <- coefs[term, "Estimate"]
+  se      <- coefs[term, "Std. Error"]
+  t_val   <- coefs[term, "t value"]
+  p_val   <- coefs[term, "Pr(>|t|)"]
+  df_val  <- df.residual(model)
+  
+  ci      <- confint(model, level = 0.95)
+  ci_low  <- ci[term, 1]
+  ci_high <- ci[term, 2]
+  
+  glue::glue(
+    "b = {sprintf('%.2f', est)}, ",
+    "SE = {sprintf('%.2f', se)}, ",
+    "95% CI [{sprintf('%.2f', ci_low)}, {sprintf('%.2f', ci_high)}], ",
+    "t({df_val}) = {sprintf('%.2f', t_val)}, ",
+    "{format_p_val(p_val)}"
+  )
+}
+
+# To use it inline in the text, we just call `r report_lm_inline(model_overall, "valence")` inside a sentence, and R Markdown drops the formatted text in when rendering.
 ```
 
-We examined the relationship between track popularity and valence (musical positivity) across the entire dataset and specifically within EDM and R&B genres. Overall, there was a weak positive correlation between valence and track popularity (*r* = `r round(cor.test(dataset$track_popularity, dataset$valence)$estimate, 3)`, *p* \< .001). However, this relationship varied substantially by genre.For EDM tracks, we found a weak positive correlation (*r* = `r round(cor.test(edm_data$track_popularity, edm_data$valence)$estimate, 3)`, *p* \< .001), suggesting that more positive-sounding EDM songs tend to be slightly more popular.In contrast, R&B showed a weak negative correlation (*r* = `r round(cor.test(rnb_data$track_popularity, rnb_data$valence)$estimate, 3)`, *p* \< .001), indicating that less positive-sounding R&B tracks are associated with greater popularity.These findings suggest that the relationship between musical positivity and popularity is genre-dependent, with opposite patterns emerging in EDM versus R&B music.
+*Overall trend*
 
-### Robustness check: do the results replicate if we control for danceability?
+```{r}
+#| results: hide
+# Simple linear regression on the whole dataset.
+model_overall <- lm(track_popularity ~ valence, data = dataset)
+```
+
+**Descriptive results.** First, let us look at the overall trend in our sample. In this model, the intercept is 40.66: the predicted popularity of a track with valence = 0, out of 100. The slope for valence is positive, but not super impressive: moving from valence = 0 to valence = 1 is associated with a predicted increase of about 3.56 popularity points. Given that the popularity scale runs from 0 to 100, this means that going all the way from the most negative-sounding track to the most positive-sounding one buys us merely a 3.56-point jump in popularity. The R² tells us how much of the variance in popularity this simple model explains in our sample: it is extremely low (0.0011, i.e. about one tenth of one percent), which means valence alone accounts for a truly negligible share of what makes a song popular. This makes sense: popularity depends on many things (artist, marketing, release date, playlist placement) that our model does not include.
+
+**Inferential results.** The slope for valence is statistically significant at the 0.05 threshold (`r report_lm_inline(model_overall, "valence")`). This means that if the true effect of valence on popularity in the population were exactly zero (the null hypothesis H0), the probability of observing a slope this far from zero or further by pure sampling luck would be minuscule (here, less than one in a hundred million). So we can safely reject that null.
+
+Given our sample size of over 30,000 tracks, however, we should not be too impressed by significance alone: with n this large, essentially any non-zero effect may come out significant. In sum: we can reasonably exclude the null hypothesis that the effect does not exist in the population: but "not zero" is a much weaker claim than "big" or "important".
+
+::: callout-caution
+## Data analysis decision
+
+From here on, I focus on EDM and R&B rather than running them on all six genres. This is because the descriptive plot suggests that the valence–popularity relationship goes in *opposite* directions in these two genres, which makes them the sharpest test of whether the effect is genre-conditional or universal.
+:::
+
+*Within EDM*
+
+```{r}
+#| results: hide
+#This code filters the dataset for edm only, then runs a linear regression testing whether valence predicts track popularity. 
+edm_data <- dataset %>% filter(playlist_genre == "edm")
+model_edm <- lm(track_popularity ~ valence, data = edm_data)
+```
+
+**Descriptive results.** Within EDM, the picture changes. The intercept is 29.67, much lower than the overall intercept of 40.66, which tells us that low-valence EDM tracks start from a lower baseline of popularity than low-valence tracks in general. But the slope is where things get interesting: moving from valence = 0 to valence = 1 in EDM is associated with an increase of about 12.88 popularity points, roughly *four times* the overall slope of 3.56. So within EDM specifically, more positive-sounding songs really do tend to be more popular, and the effect is much bigger than the overall analysis suggested. The R² is still low (0.016, i.e. about 1.6% of the variance), but noticeably larger than the overall model's R² of 0.0011, which makes sense: once we narrow down to one genre, valence starts to look like a slightly more useful predictor.
+
+**Inferential results.** The slope is statistically significant (`r report_lm_inline(model_edm, "valence")`). This means that if the true effect of valence on popularity in the EDM population were exactly zero (the null hypothesis H₀), the probability of observing a slope this far from zero or further by pure sampling luck would be minuscule (here, smaller than 2 × 10⁻¹⁶). So we can safely reject that null.
+
+Unlike the overall model, though, we can go further than just "not zero." The 95% confidence interval sits entirely on the positive side of zero, and even the low end of the interval describes a substantial effect: at least a 10-point shift across the full range of valence. So here we are not dealing with a "significant-but-trivial" finding, the effect is both statistically real and substantively meaningful.
+
+*Within RnB*
+
+```{r}
+#| results: hide
+#This code filters the dataset for RnB only, then runs a linear regression testing whether valence predicts track popularity. 
+rnb_data <- dataset %>% filter(playlist_genre == "r&b")
+model_rnb <- lm(track_popularity ~ valence, data = rnb_data)
+```
+
+**Descriptive results.** Within R&B, the pattern flips. The intercept is 49.42, higher than both the overall and the EDM intercepts, meaning R&B tracks start from a comparatively high baseline of popularity even at valence = 0. But the slope is negative: moving from valence = 0 to valence = 1 is associated with a *drop* of about 15.44 popularity points. So higher-valence R&B tracks are less popular than lower-valence ones, and the effect is bigger in absolute size than the (positive) EDM effect. This is the opposite of what a universal-appeal-of-positivity story would predict: in R&B, sad-sounding songs win. The R² (0.018, about 1.8% of the variance) is again low but slightly higher than the EDM R², telling us that valence carries a bit more weight in explaining popularity within R&B than within EDM.
+
+**Inferential results.** The slope is statistically significant (`r report_lm_inline(model_rnb, "valence")`). This means that if the true effect of valence on popularity in the R&B population were exactly zero (the null hypothesis H₀), the probability of observing a slope this far from zero or further by pure sampling luck would again be minuscule (smaller than 2 × 10⁻¹⁶). So we can safely reject that null.
+
+Same reasoning as for EDM: the 95% confidence interval lies entirely on the negative side of zero, and even the least extreme value in it corresponds to a drop of roughly 12 popularity points across the range of valence. So we can defend a stronger claim: within R&B, higher-valence tracks are meaningfully less popular.
+
+*Regression table*
+
+```{r}
+# modelsummary::modelsummary() takes a named list of models and returns
+# a formatted table showing the coefficients, standard errors, and
+# model fit statistics side by side. This is the cleanest way to
+# present several regressions at once without hand-typing the numbers.
+#
+# stars = TRUE adds significance stars; we also keep only the fit
+# statistics that are useful for a linear regression report.
+
+modelsummary(
+  list(
+    "Overall" = model_overall,
+    "EDM"     = model_edm,
+    "R&B"     = model_rnb
+  ),
+  stars = TRUE,
+  gof_map = c("nobs", "r.squared", "adj.r.squared", "F"),
+  title = "Linear regressions of track popularity on valence, overall and within EDM and R&B."
+)
+```
+
+**Table 2.** *Linear regressions of track popularity on valence, overall and within the EDM and R&B subsamples.* Each column reports a separate ordinary least squares regression predicting track popularity (0–100) from valence (0–1). The first column uses the full sample; the second restricts to tracks coded as EDM; the third to tracks coded as R&B. Cell entries show the estimated coefficient with its standard error in parentheses. Significance stars: \* p \< .05, \*\* p \< .01, \*\*\* p \< .001. Fit statistics reported below the coefficients are the number of observations (Num.Obs.), R² and adjusted R², and the F-statistic for the overall model fit.
+
+::: callout-caution
+## Data analysis decision
+
+To reach my conclusion, I ran three separate regressions (overall, within EDM, within R&B) rather than a single model with a **valence × genre interaction**. Both approaches would let me test whether the valence–popularity relationship differs across genres. I choose the separate-regressions approach because it is simpler to interpret. Interaction models are often unintuitive to interpret, while in our approach we can just compare the effect of valence on popularity in both sub-genres. I assume that showing that we have different slopes in different genres is sufficient evidence for contextual effects. There is a limitation however: this approach does not formally test whether the two slopes *differ from each other,* which an interaction model does.
+:::
+
+\[*Here, you can add additional sections, if you want to include new analyses. But your top priority is to get the required analyses right because this is what determines your grade\].*
+
+### Discussion
+
+**Main result.** Musical positivity is not universally appealing, but its appeal varies with genre. For example, in EDM, higher valence goes with more popularity; in R&B, it goes with less. This is what H2 (contextualist) predicted. However, our results are not incompatible with H1 either: we do find that there is an overall positive correlation. Thus, it may be that there is some universal cognitive baseline making positively-valenced tracks more appealing, but that very strong contextual factors can reverse this relationship. The overall regression on the full dataset would have hidden this, which shows the value of considering each genre independently when studying what factors drive music's success.
+
+**Implications.** The idea that "positive-sounding songs work better" is not exactly wrong, but it is incomplete. Valence is not a universal resource, but it is genre-conditional. What helps an EDM track can hurt an R&B one. This matters a lot for researchers interested in the cultural evolution of music, following the work of Mehr and Singh for instance. Focusing on universal psychological mechanisms to explain muscial taste can miss some heavy contextual effects. Any cognitive theory of music should therefore consider, and try to explain, why people seem to look for different musical features in different genre. One possibility is that musical appeal doesn't rest one psychological mechanism but multiple ones, and different genre appeal to different mechanisms: emotional regulation, social bonding, romantic bonding, etc...
+
+**Future studies.** One possible next step to confirm our finding is an experiment. Our dataset has many confounds: artist reputation, marketing, playlist placement, the recommendation algorithm, etc... making it difficult to isolate the causal effect of valence itself. A cleaner test would be to take a set of tracks that are otherwise very similar (same genre, same tempo range, comparable production quality) and vary only their valence, by producing altered versions of the same track. Participants would then rate each track for appeal, and we would test whether the valence–appeal slope differs across genres in the same way we found it did for popularity. If the reversal shows up under those controlled conditions, we would have strong evidence that the pattern is about listener response to valence itself, and not about the platform or some other confound.
+
+### References
+
+*\[References need to be in APA format\]*
+
+Frith, S. (1996). *Performing rites: On the value of popular music*. Harvard University Press.
+
+Mehr, S. A., Singh, M., Knox, D., Ketter, D. M., Pickens-Jones, D., Atwood, S., Lucas, C., Jacoby, N., Egner, A. A., Hopkins, E. J., Howard, R. M., Hartshorne, J. K., Jennings, M. V., Simson, J., Bainbridge, C. M., Pinker, S., O'Donnell, T. J., Krasnow, M. M., & Glowacki, L. (2019). Universality and diversity in human song. *Science*, *366*(6468), eaax0868. <https://doi.org/10.1126/science.aax0868>
+
+------------------------------------------------------------------------
+
+### Robustness check: do the results replicate if we control for danceability? (this section is optional
 
 ```{r}
 p7 = dataset %>%
@@ -256,6 +473,12 @@ p7 = dataset %>%
 
 It is possible that the relationship between valence and popularity is driven by a confound variable: danceability. Perhaps happier song also tend to be more danceable song, and it is the danceability, and not the happiness, that makes the track popular. Indeed, as the table below shows, happier songs are more danceable than sadder ones.
 
+::: callout-caution
+## Data analysis decision
+
+For this visualization, I binarize valence at 0.5, coding tracks as "Happy" (valence ≥ 0.5) or "Sad" (valence \< 0.5). Binarizing a continuous variable throws away information, and the cutoff at 0.5 is somewhat arbitrary. I accept these costs here because the binarization is only used to make two danceability distributions visually comparable, not to run a statistical test. In the regression that follows, valence is kept as a continuous variable.
+:::
+
 ```{r, echo=FALSE, fig.width=10, fig.height=8, dpi=300, dev="png", fig.align='center'}
 p7
 ```
@@ -267,9 +490,3 @@ summary(model)
 ```
 
 I run a multiple linear regression with valence as the predictor variable and danceability as an additional control variable. We find that the positive effect of valence on track popularity persists even when accounting for danceability (*β* = `r round(coef(model)["valence"], 2)`, *p* \< .001). Danceability itself shows a stronger positive association with popularity (*β* = `r round(coef(model)["danceability"], 2)`, *p* \< .001), suggesting that tracks with higher danceability tend to be more popular overall. However, the model explains only a small portion of variance in track popularity (*R*² = `r round(summary(model)$r.squared, 3)`), indicating that valence and danceability alone are insufficient to predict what makes a track popular.
-
-### Discussion
-
-This analysis reveals that valence has a small but significant positive effect on track popularity: happier-sounding tracks tend to be slightly more popular. This relationship holds even when controlling for danceability. Importantly, we also find that this relationship is heavily genre-dependent: happier songs are more popular for edm tracks but *less* popular for R&B tracks. Taken together, these results provide only weak support for the universalist prediction (H1) and stronger support for the contextualist prediction (H2): the appeal of musical positivity does not operate uniformly, but tracks the emotional conventions of specific genres.
-
-### References
