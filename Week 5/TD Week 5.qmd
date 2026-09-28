@@ -1,0 +1,288 @@
+---
+title: "TD  Week 5"
+format: 
+  html:
+    self_contained: true
+    toc: true
+    embed-resources: true
+execute:
+  echo: true
+  output: false
+  warning: false
+  message: false 
+  error: false
+editor: visual
+---
+
+# TD : Linear and Logistic Regression in the Health Sector
+
+## Instructions (read carefully!)
+
+- Submit this TD as one .qmd document and its rendered .html document on Canvas by the end of this session.
+
+- Make sure to follow the proper workflow: make sure your script, the dataset and all relevant documents are in the same file/working directory.
+
+- You are **not allowed to use AI at all** throughout the duration of this TD. If you're stuck, don't hesitate to reach out to Zakia or myself
+
+- Code must appear, but not warning messages and console outputs
+
+- Code must be well-commented and clearly written (e.g. clear variable names, coherent spacing)
+
+- Write properly. I don't mean grammar or spelling, I mean: make sure that it's easy, clear and pleasant to read you. The best tip I can give is to imagine a classmate reading your paper: would they understand easily? would everything be clear?
+
+## Context
+
+Today, you put yourself in the shoes of a data analyst working in the health sector. The ministry has recently ordered a large-scale study on diabetes involving 100,000 participants. The full dataset is still being collected, but the first results, a subsample of 1,000 participants, have just arrived on your desk.
+
+Your goal: derive some useful insights from this data. The ministry wants to understand what predicts diabetes and related health outcomes, so they can better target prevention campaigns.
+
+The dataset contains:
+
+- **gender**: Female, Male, or Other
+- **age**: in years (0 to 80)
+- **hypertension**: 0 = no, 1 = yes
+- **heart_disease**: 0 = no, 1 = yes
+- **smoking_history**: never, current, former, No Info.
+- **bmi**: Body Mass Index
+- **HbA1c_level**: average blood sugar over 2-3 months.
+- **blood_glucose_level**: glucose in the blood at the time of measurement
+- **diabetes**: 0 = no, 1 = yes
+
+The ministry cares about this for a concrete reason: diabetes is expensive. It costs the health system a lot in long-term care (dialysis, amputations, cardiovascular complications), and most of it is preventable if you catch people at risk early. But you can't screen everyone — screening costs money too. So the ministry needs to know which factors actually predict diabetes, and how strongly, so they can target prevention campaigns at the right people.
+
+Your job today is to help them figure this out.
+
+```{r}
+# Required libraries
+library(tidyverse)
+library(performance)
+library(effectsize)
+library(see)
+
+# Load the data
+data <- read.csv("diabetes_subsample.csv")
+glimpse(data)
+```
+
+### Question 0
+
+Before starting, take 2 minutes to look at the data. How many diabetics are there in the sample? What's the average age? Does anything look strange?
+
+------------------------------------------------------------------------
+
+## Part 1: BMI and blood sugar (continuous → continuous)
+
+*Your first question is simple. Before looking at diabetes itself, the ministry wants to understand blood sugar regulation more broadly. HbA1c is a measure of your average blood sugar over the last 2-3 months — think of it as a "long-term memory" of your glucose levels, unlike a one-shot glucose reading that only captures a single moment. It's a good early-warning indicator: someone can have high HbA1c without being diabetic yet, but they're heading in that direction.*
+
+*The ministry suspects that people with a higher BMI have worse blood sugar regulation. If this is true, BMI could be used as a cheap, easy-to-measure screening tool — no blood test needed. You decide to test this.*
+
+::: callout-tip
+## Template
+
+The most important part of this TD is to learn how to properly interpret data. Don't hesitate to go take a look a the Spotify template to see how I formulate the results from regressions. It can also help for programming plots and other operations.
+
+For a tutorial on how to run linear and logistic regressions in R, you can click here: <https://www.statology.org/glm-vs-lm-in-r/>
+:::
+
+### Question 1
+
+Create a scatterplot with `bmi` on the x-axis and `HbA1c_level` on the y-axis. Add a linear regression line.
+
+Does the relationship look linear?
+
+### Question 2
+
+Fit a linear model (`m1`) where `bmi` predicts `HbA1c_level`. Look at the output with `summary(m1)`.
+
+### Question 3
+
+Interpret the intercept. What does it represent here? Is the intercept meaningful in the real world?
+
+### Question 4
+
+Interpret the slope. What does it represent in real life? Do you see it as a meaningful effect?
+
+### Question 5
+
+Look at the p-value for the slope. What does it tell you?
+
+### Question 6
+
+Use `predict()` to estimate the HbA1c level of someone with a BMI of 30. Then do the same for a BMI of 22. Interpret the difference.
+
+> **On using the `predict()` function**
+>
+> `predict()` allows you to use a model on new data. The workflow is the following:
+>
+> **1) Create a dataset with the "new" data.** You need to make sure this data contains all the variables used in the model. For instance, if my model uses `bmi` to predict `HbA1c_level`, I need to create a new data point with a value for `bmi`:
+>
+> ``` r
+> fictional_patient <- data.frame(
+>   bmi = 30
+> )
+> ```
+>
+> Here I only create one new data point (i.e. one patient), but you could build a dataset with multiple patients at once.
+>
+> **2) Use the model on this new data.** The syntax is:
+>
+> ``` r
+> prediction <- predict(m1, newdata = fictional_patient, interval = "confidence", level = 0.95)
+> prediction
+> ```
+>
+> The `interval = "confidence", level = 0.95` arguments give you the 95% confidence interval around the prediction, which tells you the margin of precision.
+>
+> **A note for logistic regression (Parts 3 and 4):** when the outcome is binary, add `type = "response"` to get a probability (between 0 and 1) instead of a log-odds value. The confidence interval option doesn't work the same way for `glm()`, so you can leave it out for those parts.
+>
+> ``` r
+> prediction <- predict(m3, newdata = fictional_patient, type = "response")
+> ```
+
+------------------------------------------------------------------------
+
+## Part 2: Hypertension and blood sugar (binary → continuous)
+
+*Now the ministry asks a different question. Hypertension (chronic high blood pressure) and diabetes often go together — they share risk factors like obesity, inactivity, and age, and each one makes the other worse. If hypertension is a strong marker of poor blood sugar regulation, then general practitioners could flag hypertensive patients for diabetes screening during routine blood pressure checks — a very cheap intervention.*
+
+*Do people with hypertension have higher HbA1c on average than people without? This is a binary predictor (hypertension: yes/no) with a continuous outcome.*
+
+### Question 1
+
+Create a plot showing the distribution of `HbA1c_level` for people with and without hypertension. A boxplot works well here.
+
+Do the two groups look different?
+
+### Question 2
+
+Fit a linear model (`m2`) where `hypertension` predicts `HbA1c_level`.
+
+### Question 3
+
+Interpret the intercept. What does it represent when the predictor is binary? Which group does it correspond to?
+
+### Question 4
+
+Interpret the slope. What does it mean when the predictor takes only two values (0 and 1)? Is this value meaningful in the real world?
+
+### Question 5
+
+Interpret the p-value.
+
+## Part 3: Age and diabetes (continuous → binary)
+
+*So far you've looked at HbA1c, which is a continuous risk indicator. But the ministry ultimately cares about actual diabetes diagnoses — that's what drives the health budget. Note the difference: HbA1c is a measurement on a scale, diabetes is a yes/no clinical diagnosis (usually made when HbA1c crosses 6.5, combined with other criteria). A person can have elevated HbA1c and not yet be classified as diabetic.*
+
+*The ministry now wants to know: does age predict whether someone actually has diabetes? Age is not modifiable, but if it's a strong predictor, it tells you which age brackets to target for systematic screening. Here the outcome is binary (diabetes: yes/no), so linear regression is no longer appropriate — a linear model could predict probabilities above 1 or below 0, which makes no sense. You switch to logistic regression.*
+
+### Question 1
+
+Before running the model, create a scatterplot with `age` on the x-axis and `diabetes` on the y-axis. Why doesn't a linear line make sense here? What shape does the logistic curve take?
+
+### Question 2
+
+Fit a logistic regression model (`m3`) where `age` predicts `diabetes`. Use `glm()` with `family = binomial`.
+
+### Question 3
+
+Look at the coefficients. What does the intercept represent?
+
+### Question 4
+
+Interpret the slope for age. What does it mean in log-odds? Then convert it to an odds ratio using `exp(coef(m3))`. What does the odds ratio tell you?
+
+### Question 5
+
+Look at the p-value. What can you conclude?
+
+### Question 6
+
+Use `predict()` with `type = "response"` to estimate the probability of diabetes for someone aged 25, aged 50, and aged 75. Interpret these probabilities. Would you say age is a strong predictor?
+
+### Question 7
+
+The odds ratio you computed in Question 4 is informative but hard to explain to a non-statistician (imagine telling the Minister "the odds of diabetes are multiplied by 1.07 per year of age"). A much more intuitive quantity is the **average marginal effect (AME)** — see the box below.
+
+Compute the AME of `age` on the probability of diabetes using the `marginaleffects` package:
+
+``` r
+library(marginaleffects)
+avg_slopes(m3)
+```
+
+Interpret the result in one sentence, in language you could use in a report to the ministry.
+
+> **On average marginal effects (AME)**
+>
+> Logistic regression coefficients are on the log-odds scale, which nobody thinks in. Odds ratios are better, but still awkward, most people don't have good intuitions about odds.
+>
+> The **average marginal effect** translates the model back into something everyone understands: **change in probability**. Specifically, it answers the question: "On average, in this sample, how much does the probability of the outcome change when the predictor increases by 1 unit?"
+>
+> For a continuous predictor like age, the AME tells you: on average, one additional year of age is associated with an X percentage-point change in the probability of diabetes. Much more intuitive to understand.
+>
+> For a binary predictor like hypertension, the AME tells you: on average, having hypertension is associated with an X percentage-point difference in the probability of diabetes, compared to not having it.
+>
+> Why "average"? Because in logistic regression, the effect of a predictor on the probability is not constant: it depends on where you are on the predictor scale. The AME averages this effect across all observations in the sample, giving you one clean number.
+>
+> This is usually the number you want to report to non-statisticians.
+
+------------------------------------------------------------------------
+
+## Part 4: Hypertension and diabetes (binary → binary)
+
+*Finally, the ministry pulls the two previous threads together. If hypertension predicts higher HbA1c (Part 2), does it also predict actual diabetes diagnoses? This matters directly for policy: if the association is strong, the ministry could recommend that every hypertensive patient gets a yearly HbA1c test — a cheap, well-targeted screening strategy. If the association is weak, that policy would waste resources.*
+
+*Both variables are binary.*
+
+### Question 1
+
+Create a plot showing the proportion of diabetics among people with and without hypertension. A bar plot of proportions works well.
+
+Do the two groups look different?
+
+### Question 2
+
+Fit a logistic regression model (`m4`) where `hypertension` predicts `diabetes`.
+
+### Question 3
+
+Interpret the intercept. What does it represent on the log-odds scale?
+
+### Question 4
+
+Interpret the slope. Convert it to an odds ratio. What does it tell you about the association between hypertension and diabetes?
+
+### Question 5
+
+Interpret the p-value.
+
+### Question 6
+
+Use `predict()` with `type = "response"` to estimate the probability of diabetes for someone with hypertension, and for someone without. Compare the two.
+
+### Question 7
+
+As in Part 3, compute the average marginal effect of `hypertension` on the probability of diabetes:
+
+``` r
+avg_slopes(m4)
+```
+
+Interpret the result in one sentence, in the kind of language you'd use in a policy brief. Which is more useful for the ministry: the odds ratio from Question 4, or the AME? Why?
+
+------------------------------------------------------------------------
+
+## Wrap-up
+
+You have now run four regression models, covering all four combinations of predictor and outcome type:
+
+| Predictor  | Outcome    | Model               |
+|------------|------------|---------------------|
+| Continuous | Continuous | Linear regression   |
+| Binary     | Continuous | Linear regression   |
+| Continuous | Binary     | Logistic regression |
+| Binary     | Binary     | Logistic regression |
+
+Take 5 minutes to write a short paragraph summarizing what you would tell the ministry. Which factors seem to matter most? What would you want to check before making stronger claims (think about confounders, sample size, the fact that this is only 1,000 out of 100,000 participants)?
+
+Think especially about the *practical* significance of your findings, not just the statistical significance. A tiny effect can be "significant" in a big sample without being useful for policy. This is where quantities like the AME really matter — they force you to say what the effect actually *is*, in terms anyone can understand.
