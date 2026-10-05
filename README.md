@@ -118,15 +118,14 @@ _Week 6: Oral presentations: research report 1 in one graph_
 Each student briefly presents their RR1 results with one graph. No reading notes. 5 minute presentation + 1 question from the audience. 
 To ensure maximum attention, the use of laptops by the audience is forbidden in this class. 
 
-_Week 7: Common data analysis problems_
+_Week 7: RECAP_
 
-* TD: Solve common data analysis problems
+* TD: RECAP TD
 * Learning outcomes: 
-  * Detect and deal with missing values
-  * Detect and deal with outliers
-  * Detect and deal with non-normal distribution of variables
-  * Detect and deal with violations of model assumptions in linear regression
-* Mandatory readings: TBD
+  * Recap class content & skills so far
+* Mandatory readings: 
+  * The Programming Cheatsheet
+  * The Statistics Cheatsheet
 
 
 _**Week 8: MIDTERM EXAM**_
@@ -137,6 +136,7 @@ _Week 9: Sensitivity analysis_
 
 * TD: Auditing a dataset
 * Learning outcomes: 
+  * Use DAGs to justify a model specification
   * Compute Akaike's Information Criteria (AIC) and Lasso regression for model selection
   * Run sensitivity checks to test the robustness of findings
 * Mandatory readings: Sections 8 and 9 of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/
