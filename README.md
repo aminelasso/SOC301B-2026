@@ -99,17 +99,13 @@ _Week 4: Introduction to the General Linear Model_
     * Watch all StatQuest videos from this playlist: https://www.youtube.com/watch?v=aFDOzpTeg0s&list=PLblh5JKOoLUIzaEkCLIUxQFjPIlapw8nU
     * Read Sections 3 to 4.2 (included) of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/ (section 4.3 is optional)
 
-_Week 5: Generalized linear models, mixed models and ANOVA_
+_Week 5: Generalized linear models_
 * TD: applying logistic regressions, mixed models and ANOVA to the behavioral data
 * Learning outcomes: 
   * Run and properly interpret logistic regressions and odds ratio while avoiding common pitfalls
-  * Identify multilevel data and its challenges and properly using linear mixed models in the process
-  * Run and properly interpret ANOVAs
 * Mandatory readings:
     * Watch the following videos in order
         * On generalized linear models: Videos 1-6 from this playlist: https://youtube.com/playlist?list=PLblh5JKOoLUKxzEP5HA2d-Li7IJkHfXSe&si=wad7IsGlApLWXikD
-        * On mixed models: https://www.youtube.com/watch?v=51SMnDN0ye0
-    * Read Sections 6 and 7 of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/
 
 **05/10, 9AM: SUBMIT RESEARCH REPORT 1**
 
@@ -126,46 +122,46 @@ _Week 7: RECAP_
 * Mandatory readings: 
   * The Programming Cheatsheet
   * The Statistics Cheatsheet
+* Optional readings: all StatQuest videos from previous classes.
 
 
 _**Week 8: MIDTERM EXAM**_
 
 2 hours. The midterm exam will be a pen-and-paper exercise and consist in two main types of exercises. One section will test your ability to comment on and interpret a data analysis project from A to Z. You will be asked a series of questions designed to test your programming abilities, statistical reasoning, and your general skills regarding data analysis (e.g., how to make data analysis decisions and interpret results). A second type of exercises will test more specific knowledge, by exposing you to a series of isolated data analysis decisions. You will be presented with specific situations, data analysis decisions, or chunks of code, and you will be asked to answer questions about them.
 
-_Week 9: Sensitivity analysis_
+_Week 9: Interaction models, ANOVA and linear mixed models_
 
-* TD: Auditing a dataset
 * Learning outcomes: 
-  * Use DAGs to justify a model specification
-  * Compute Akaike's Information Criteria (AIC) and Lasso regression for model selection
-  * Run sensitivity checks to test the robustness of findings
-* Mandatory readings: Sections 8 and 9 of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/
+    * Run and properly interpret and visualize interaction models
+    * Identify multilevel data and its challenges and properly using linear mixed models in the process
+    * Run and properly interpret ANOVAs
+
+* Mandatory readings: read again Sections 6 and 7 of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/
 
 
-_Week 10: Causal inference_
+_Week 10: Common traps: missing values, outliers, and the Simpson paradox_
 
-* TD: Implement causal inference techniques in behavioral data
 * Learning outcomes: 
-  * Understand the logic behind the main causal inference methods: experiments, difference-in-difference, statistical matching, instrumental variable
-  * Run a regression discontinuity design
+  * Deal with missing values (test for MCAR; imputation techniques)
+  * Identify outliers and leverage (Cook's distance)
+  * Identify a Simpson paradox in data
 * Mandatory readings: TBD
 
 
-_Week 11: Predictive modeling (1)_
+_Week 10: Model selection_
 
-* TD: Using a model to predict the future
-* Learning outcomes:
-  * Master key concepts in predictive modeling: overfitting and the bias-variance trade-off; out-of sample prediction; test-train split; cross-validation; regression and classification
-  * Implement predictive modeling and cross-validation using the caret package in R
-* Mandatory reading: TBD
-
-_Week 12: Predictive modeling (2)_
-
-* TD: Classification models and regularization
 * Learning outcomes: 
-  * Master key concepts in classification: confusion matrix; precision, recall and F1 score; ROC and AUC
-  * Master key concepts in regularization: penalty, ridge regression, lasso regression, hyperparameter tuning, automatic variable selection...
-  * Implement classification models in behavioral data
+  * Use DAGs to justify a model specification
+  * Run the assumption checks before running a regression; robust standard errors
+  * Compute Akaike's Information Criteria (AIC) and Lasso regression for model selection
+* Mandatory readings: Sections 8 and 9 of From Questions to Knowledge by Daniel Nettle: https://bookdown.org/danielnettle2/data_analysis/
+
+
+_Week 12: Sensitivity analyses_
+
+  * Understand "the garden of forking paths", the risk of false positives
+  * Run sensitivity checks to test the robustness of findings
+
 
 **30/11, 9AM: SUBMIT RESEARCH REPORT 2**
 
