@@ -143,12 +143,12 @@ _Week 10: Common traps: missing values, outliers, and the Simpson paradox_
 
 * Learning outcomes: 
   * Deal with missing values (test for MCAR; imputation techniques)
-  * Identify outliers and leverage (Cook's distance)
+  * Identify outliers and leverage (e.g. Cook's distance)
   * Identify a Simpson paradox in data
 * Mandatory readings: TBD
 
 
-_Week 10: Model selection_
+_Week 11: Model selection_
 
 * Learning outcomes: 
   * Use DAGs to justify a model specification
